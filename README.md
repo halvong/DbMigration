@@ -1,2 +1,4 @@
 DbMigration, Golang, working ubuntu
-3/8/2019
+
+#path
+cd /home/hal/Documents/softwares/eclipse_golang/workspace/src/DbMigration
