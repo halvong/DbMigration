@@ -125,7 +125,7 @@ func main() {
 					outfile := dir_writes + "/" + filename  
 
 					log.Printf("%v. file_name: %v\n",strconv.Itoa(idx + 1),infile)
-					fmt.Printf("%v. file_name: %v\n",strconv.Itoa(idx + 1),infile)
+					fmt.Printf("\n%v. file_name: %v",strconv.Itoa(idx + 1),infile)
 					var ok bool = regexfunc(infile, outfile)
 
 					if ok {
@@ -151,13 +151,11 @@ func main() {
     }//for
     
     if idx == 0 {
-		msg := "\nNo sql files found."
-		log.Println(msg)
-		fmt.Println(msg)
+		log.Println("No sql files found.\n\t\t\t\t\t\t-------")
+		fmt.Println("\nNo sql files found.\n")
     } else {
-		msg := "Done\n"
-		log.Println(msg)
-		fmt.Println(msg)
+		log.Println("Done\n\t\t\t\t\t\t-------")
+		fmt.Println("\nDone\n")
     } 
 
 	loghandle.Close() //close log handle
