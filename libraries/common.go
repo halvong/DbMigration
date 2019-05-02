@@ -18,15 +18,17 @@ type data struct {
 
 func RegexVerifyfunc(file_ptr *[]string) bool {
 	
-	fmt.Printf("\nfile size: %v\n", len(*file_ptr))
+	max := len(*file_ptr) 
+	max -= 1
+
 	var idx = 1
 	for _, infile := range *file_ptr {
 
 		if _, err := os.Stat(infile); err == nil { //checks if file exists
 			match, _ := regexp.MatchString("\\.sql$", infile)
 			if match {
-				fmt.Printf("%v. %v\n", idx, infile)
 
+				fmt.Printf("%v/%v. %v\n", idx, max, infile)
 				r, err := ioutil.ReadFile(infile)//read file
 
 				if err != nil {
@@ -36,7 +38,7 @@ func RegexVerifyfunc(file_ptr *[]string) bool {
 
 				result := re2.MatchString(string(r))
 				if result == true {
-					panic(fmt.Sprintf("%v has %v.\n", infile, result))	
+					fmt.Printf("%v is wronged: %v.\n", infile, result)	
 					return false
 				} else {
 					fmt.Printf("%v\n", result)	

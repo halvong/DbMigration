@@ -141,10 +141,11 @@ func main() {
 	result := cc.RegexVerifyfunc(&files)
 
 	if result == false {
-		fmt.Println("Failed")
+		fmt.Println("***Failed***")
 	} else {
-		fmt.Println("Success!")
+		fmt.Println("***Success!***")
 	}
+
 }
 
 
