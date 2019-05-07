@@ -6,6 +6,7 @@ import (
 	"os"
 	"io/ioutil"
 	"regexp"
+	"strconv"
 	"path"
 	_ "path/filepath"
 )
@@ -37,23 +38,22 @@ func RegexReadsfunc(file_ptr *[]string, reads_dir string, writes_dir string) boo
 				dataobj.infile = infile
 				dataobj.outfile = writes_dir + "/" + newfileName(filename)
 
-				/*	
 				log.Printf("%v. Processing file: %v\n",strconv.Itoa(idx + 1),infile)
 				fmt.Printf("\n%v. Processing file: %v",strconv.Itoa(idx + 1),infile)
+				
 				//var ok bool = regexfunc(infile, outfile)
 				var ok bool = regexfunc(dataobj)
 
 				if ok {
 
 					log.Println("\tSuccess. Modify file:",dataobj.outfile)
-					if delete_write_bool { 
-						deleteFile(infile)
-					}
+					//if delete_write_bool { 
+					//	deleteFile(infile)
+					//}
 
 				} else {
 					log.Printf("\tFailed to modify %v",dataobj.outfile)
 				}
-				*/
 
 				idx += 1
 
@@ -126,4 +126,47 @@ func newfileName(filename string) string {
 	}
 	
 	return filename
+}
+
+func regexfunc(indata data) bool {
+	//fmt.Printf("\n\tregexfunc:\n\tinfile: %v,\n\toutfile: %v\n",infile, outfile)
+
+	if _, err := os.Stat(indata.infile); err == nil {
+		//fmt.Printf("\ninfile: %v exists", infile)
+
+		r, err := ioutil.ReadFile(indata.infile)//read file
+
+		if err != nil {
+			panic(err)
+			return false
+		}
+
+		//if _, err := os.Stat(indata.outfile); err == nil {//if outfile exists, deletes. 
+		//	deleteFile(indata.outfile) 
+		//}		
+		
+		//regex string
+		//content := strings.Replace(string(r), "CREATE DATABASE  IF NOT EXISTS `web_main_live`","", -1)
+		//content = strings.Replace(content, "`web_main_live`","`web_main_qa`", -1)
+		//re := regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live`")
+
+		//1o2
+		//re := regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live` \\/\\*!40100 DEFAULT CHARACTER SET latin1 \\*\\/;")
+		content := re.ReplaceAllString(string(r), "") 
+		//2o2
+		//re2 := regexp.MustCompile("web_main_live")
+		content = re2.ReplaceAllString(content, "web_main_qa") 
+
+		err = ioutil.WriteFile(indata.outfile, []byte(content), 0777)//writes content
+
+		if err != nil {
+			panic(err)
+			return false
+		}
+		
+		return true
+
+	}//outside if 
+
+	return false 
 }
