@@ -1,29 +1,12 @@
 package main
 
 import (
+	"os"
 	"fmt"
-	"regexp"
+	"reflect"
 )
 
-
 func main() {
-
-    fmt.Println("Running misc")
-
-	var title string = "main_live_adwords_geotarget.sql"
-
-	match, _ := regexp.MatchString("^web_main_live_", title)
-
-	if match {
-
-		substring := title[14:len(title)]
-
-		fmt.Printf("Substring: %v",substring)
-
-	} else {
-
-		fmt.Println("Not found")
-	}
-
-
+	fp, _ := os.OpenFile("logfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
+	fmt.Println("\ntype: ", reflect.TypeOf(fp))
 }
