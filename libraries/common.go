@@ -24,19 +24,18 @@ func WalkFiles(dir_reads string) []string {
 	return files	
 }
 
-func DeleteFile(infile string) bool {
+func DeleteFile(infile_ptr *string) bool {
     // deletes file, TEST3
-    _, err := os.Stat(infile)
+    _, err := os.Stat(*infile_ptr)
 
 	if err == nil {
 
-		err := os.Remove(infile)
+		err := os.Remove(*infile_ptr)
 
 		if err != nil {
-			fmt.Printf("\tFile %v failed to delete.",infile)
+			fmt.Printf("\tFile %v failed to delete.", *infile_ptr)
 			return false
 		}
-		//fmt.Println("\n\tFile Deleted")
 		return true
 	}
 

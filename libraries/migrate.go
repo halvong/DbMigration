@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"path"
-	_ "path/filepath"
+	//cc "common"
 )
 
 var re = regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live` \\/\\*!40100 DEFAULT CHARACTER SET latin1 \\*\\/;")
@@ -19,7 +19,7 @@ type data struct {
 	outfile string
 }
 
-func RegexReadsfunc(file_ptr *[]string, reads_dir string, writes_dir string) bool {
+func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr *string) bool {
 
 	fmt.Printf("\nfiles: %v size", len(*file_ptr))
 	var idx = 0
@@ -33,23 +33,22 @@ func RegexReadsfunc(file_ptr *[]string, reads_dir string, writes_dir string) boo
 
 				_, filename := path.Split(infile)
 
-
 				var dataobj data 
 				dataobj.infile = infile
-				dataobj.outfile = writes_dir + "/" + newfileName(filename)
+				dataobj.outfile = *writes_dir_ptr + "/" + newfileName(filename)
 
 				log.Printf("%v. Processing file: %v\n",strconv.Itoa(idx + 1),infile)
 				fmt.Printf("\n%v. Processing file: %v",strconv.Itoa(idx + 1),infile)
 				
-				//var ok bool = regexfunc(infile, outfile)
 				var ok bool = regexfunc(dataobj)
 
 				if ok {
 
 					log.Println("\tSuccess. Modify file:",dataobj.outfile)
-					//if delete_write_bool { 
-					//	deleteFile(infile)
-					//}
+
+					if *delete_infile_ptr == true { 
+						DeleteFile(&infile) 
+					}
 
 				} else {
 					log.Printf("\tFailed to modify %v",dataobj.outfile)
@@ -72,8 +71,6 @@ func RegexReadsfunc(file_ptr *[]string, reads_dir string, writes_dir string) boo
 		log.Println("Done\n\t\t\t\t\t\t-------")
 		fmt.Println("\nDone\n")
     } 
-
-	
 
 	return true
 }
@@ -141,9 +138,10 @@ func regexfunc(indata data) bool {
 			return false
 		}
 
-		//if _, err := os.Stat(indata.outfile); err == nil {//if outfile exists, deletes. 
-		//	deleteFile(indata.outfile) 
-		//}		
+		//if outfile exists, deletes. 
+		if _, err := os.Stat(indata.outfile); err == nil {
+			DeleteFile(&indata.outfile) 
+		}		
 		
 		//regex string
 		//content := strings.Replace(string(r), "CREATE DATABASE  IF NOT EXISTS `web_main_live`","", -1)

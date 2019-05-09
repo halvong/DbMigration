@@ -15,7 +15,7 @@ import (
 func main() {
 	//TEST2
 	var which string = "migrate" 
-	which = "check" 
+	//which = "check" 
 	var files []string 
 	var reads_dir string = "/home/hal/dumps/reads"
 	var writes_dir string = "/home/hal/dumps/hot"
@@ -30,12 +30,11 @@ func main() {
 		panic(logerr)
 	}
 
-	var delete_write_bool = true 
+	var delete_infile_bool bool = true
 
-	//TODO todo 
-	if delete_write_bool {
-		cc.DeleteFile("logfile")
-	}
+	//deletes logfile
+	//cc.DeleteFile("logfile")
+	
 
 	log.SetOutput(fp)
 	fmt.Printf("\n%v", "Starts processing sql files")
@@ -44,12 +43,13 @@ func main() {
 	log.Printf("%v", "\t------------\n\t\t\t\t\t\tStarts processing sql files")
 
 	var result bool = false  
+
 	if which != "migrate" {
 		files = cc.WalkFiles(hot_dir)//returns file from directory
 		result = cc.RegexVerifyHotfunc(&files)
 	} else {
 		files = cc.WalkFiles(reads_dir)//returns file from directory
-		result = cc.RegexReadsfunc(&files, reads_dir, writes_dir)
+		result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir)
 	}
 
 	if result == false {
