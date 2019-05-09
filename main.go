@@ -15,13 +15,11 @@ import (
 func main() {
 	//TEST2
 	var which string = "migrate" 
-	//which = "check" 
+	which = "check" 
 	var files []string 
 	var reads_dir string = "/home/hal/dumps/reads"
 	var writes_dir string = "/home/hal/dumps/hot"
 	var hot_dir string = writes_dir
-
-	fmt.Println("Hello")
 
 	//logging
 	fp, logerr := os.OpenFile("logfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
@@ -35,10 +33,9 @@ func main() {
 	//deletes logfile
 	//cc.DeleteFile("logfile")
 	
-
 	log.SetOutput(fp)
 	fmt.Printf("\n%v", "Starts processing sql files")
-	fmt.Printf("\ndir: %v. %v\n", reads_dir, which)
+	fmt.Printf("\n\tRead dir: %v. Type: %v\n", reads_dir, which)
 	
 	log.Printf("%v", "\t------------\n\t\t\t\t\t\tStarts processing sql files")
 

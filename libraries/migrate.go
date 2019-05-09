@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"path"
-	//cc "common"
 )
 
 var re = regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live` \\/\\*!40100 DEFAULT CHARACTER SET latin1 \\*\\/;")
@@ -20,8 +19,9 @@ type data struct {
 }
 
 func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr *string) bool {
+	var max int = len(*file_ptr)
+	fmt.Printf("\nfiles: %v size", max) 
 
-	fmt.Printf("\nfiles: %v size", len(*file_ptr))
 	var idx = 0
 	for _, infile := range *file_ptr {
 
@@ -37,8 +37,8 @@ func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr 
 				dataobj.infile = infile
 				dataobj.outfile = *writes_dir_ptr + "/" + newfileName(filename)
 
-				log.Printf("%v. Processing file: %v\n",strconv.Itoa(idx + 1),infile)
-				fmt.Printf("\n%v. Processing file: %v",strconv.Itoa(idx + 1),infile)
+				log.Printf("%v/%v. Processing file: %v\n",strconv.Itoa(idx + 1), max, infile)
+				fmt.Printf("\n%v/%v. Processing file: %v",strconv.Itoa(idx + 1), max, infile)
 				
 				var ok bool = regexfunc(dataobj)
 
