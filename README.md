@@ -1,11 +1,14 @@
 DbMigration, Golang, working ubuntu
-5/9 Thurs
+5/15 Wed
 
 Add mysql connection code
 
 #path
 cd /home/hal/Documents/softwares/eclipse_golang/workspace/src/DbMigration
 
+#hot path
+cd /home/hal/dumps/hot
+grep -rni 'web_main_live' 
 
 #datatypes
 bool

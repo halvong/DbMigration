@@ -97,10 +97,10 @@ func RegexVerifyHotfunc(file_ptr *[]string) bool {
 
 				result := re2.MatchString(string(r))
 				if result == true {
-					fmt.Printf("%v is wronged: %v.\n", infile, result)	
+					fmt.Printf("%v failed. Found web_main_live.\n", infile)	
 					return false
 				} else {
-					fmt.Printf("%v\n", result)	
+					fmt.Printf("%v\n", "passed")	
 				}	
 
 				idx += 1

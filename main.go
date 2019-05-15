@@ -11,15 +11,15 @@ import (
 	 cc "DbMigration/libraries"
 )
 
+var which string = "migrate" 
+var reads_dir string = "/home/hal/dumps/reads"
+var writes_dir string = "/home/hal/dumps/hot"
 	
 func main() {
 	//TEST2
-	var which string = "migrate" 
 	which = "check" 
-	var files []string 
-	var reads_dir string = "/home/hal/dumps/reads"
-	var writes_dir string = "/home/hal/dumps/hot"
 	var hot_dir string = writes_dir
+	var files []string 
 
 	//logging
 	fp, logerr := os.OpenFile("logfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
@@ -41,12 +41,12 @@ func main() {
 
 	var result bool = false  
 
-	if which != "migrate" {
-		files = cc.WalkFiles(hot_dir)//returns file from directory
-		result = cc.RegexVerifyHotfunc(&files)
-	} else {
+	if which == "migrate" {
 		files = cc.WalkFiles(reads_dir)//returns file from directory
 		result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir)
+	} else {
+		files = cc.WalkFiles(hot_dir)//returns file from directory
+		result = cc.RegexVerifyHotfunc(&files)
 	}
 
 	if result == false {
