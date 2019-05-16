@@ -20,6 +20,7 @@ type data struct {
 
 func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr *string) bool {
 	var max int = len(*file_ptr)
+	max -= 1 //minus the folder
 	fmt.Printf("\nfiles: %v size", max) 
 
 	var idx = 0
@@ -78,7 +79,7 @@ func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr 
 func RegexVerifyHotfunc(file_ptr *[]string) bool {
 	
 	max := len(*file_ptr) 
-	max -= 1
+	max -= 1 //minus the folder
 
 	var idx = 1
 	for _, infile := range *file_ptr {
