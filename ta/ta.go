@@ -1,17 +1,16 @@
 package main
 
 import (
-    "bufio"
-    "encoding/csv"
     "fmt"
     "io"
     "os"
+    "bufio"
+    "encoding/csv"
+	_"strconv"
 	"database/sql"
-	"regexp"
     conn "DbMigration/ta/db"
 )
 
-var re = regexp.MustCompile(`^\((\d{3})\)\s(\d{3})-(\d{4})`)
 
 type Record struct {
 	leadsource string `json:"leadsource"`		
@@ -46,7 +45,6 @@ func main() {
 	var records []Record
 
 	csvFile, err := os.Open("ta/ta3.csv")
-	//_ = csvFile
 
 	if err != nil {
 		fmt.Println("Bad. Cannot open file:",err)
@@ -93,26 +91,20 @@ func main() {
     defer db.Close()
 
 
+	//var data [][]string
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source"}}
+
     fmt.Println("-------")
 	var max = len(records)
 	var cnt = 1
     for i := range records {
+
 		var phones []string
-		var aa string
-		var bb string
 
-    	fmt.Printf("\n%v/%v. %v %v, email: %v, phone: %v, mobile: %v\n", cnt, max, records[i].first, records[i].last, records[i].email, records[i].phone, records[i].mobile)
-		match := re.FindStringSubmatch(records[i].phone)
-		if len(match) == 4 {
-			aa = fmt.Sprintf("1%v%v%v", match[1], match[2], match[3])
-			phones = append(phones, aa)
-		}
+    	fmt.Printf("%v/%v. %v %v, email: %v, phone: %v, mobile: %v\n", cnt, max, records[i].first, records[i].last, records[i].email, records[i].phone, records[i].mobile)
 
-		match2 := re.FindStringSubmatch(records[i].mobile)
-		if len(match2) == 4 {
-			bb = fmt.Sprintf("1%v%v%v", match2[1], match2[2], match2[3])
-			phones = append(phones, bb)
-		}
+		conn.ConvertsPhone(&phones, records[i].phone)
+		conn.ConvertsPhone(&phones, records[i].mobile)
 
 		var results *sql.Rows = conn.SelectRecordfunc(db, phones, records[i].email)
 
@@ -127,19 +119,32 @@ func main() {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-			fmt.Printf("firm: %v\n",tag.firm)
+			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, fmt.Sprint(tag.id), tag.firm.String})
 
 		}//for
 
 		cnt+=1
 
     }//for
+    
+	//write csv file
+	var output string = "ta/result.csv"
+	delete_bool := conn.DeleteFile(&output)
+	if delete_bool {
+		fmt.Println("\nDeletes old result.csv successful.")
+	}
 
+	file, err := os.Create(output)
+    conn.CheckError("Cannot create file", err)
+    defer file.Close()
+	writer := csv.NewWriter(file)
+    defer writer.Flush()
+    
+	fmt.Println("Writes to result.csv.")
+	writer.WriteAll(data)
     
 }//func
 
-
-
-
+//misc
 
 

@@ -1,13 +1,53 @@
 package db
 
 import (
+	"os"
+	"log"
 	"fmt"
-	_ "strconv"
+	"regexp"
 	"database/sql"
-	_ "strings"
 )
 
+var re = regexp.MustCompile(`^\((\d{3})\)\s(\d{3})-(\d{4})`)
 
+func CheckError(message string, err error) {
+    if err != nil {
+        log.Fatal(message, err)
+    }
+}
+
+func ConvertsPhone(phones *[]string, phone string) {
+
+		var res string
+
+		match := re.FindStringSubmatch(phone)
+		if len(match) == 4 {
+			res = fmt.Sprintf("1%v%v%v", match[1], match[2], match[3])
+		}
+
+		if res != "" {
+			*phones = append(*phones, res)
+		}
+		//return res
+}
+
+func DeleteFile(infile_ptr *string) bool {
+    // deletes file, TEST3
+    _, err := os.Stat(*infile_ptr)
+
+	if err == nil {
+
+		err := os.Remove(*infile_ptr)
+
+		if err != nil {
+			fmt.Printf("\tFile %v failed to delete.", *infile_ptr)
+			return false
+		}
+		return true
+	}
+
+	return false
+}
 
 func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 	var str string
