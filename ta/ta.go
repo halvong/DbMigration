@@ -44,14 +44,15 @@ func main() {
 	 
 	var records []Record
 
-	csvFile, err := os.Open("ta/ta3.csv")
+	csvFile, err := os.Open("ta/data/ta3.csv")//full records
+	//csvFile, err := os.Open("ta/data/ta5.csv")//32 records
+	//csvFile, err := os.Open("ta/data/ta4.csv")//few records
 
 	if err != nil {
 		fmt.Println("Bad. Cannot open file:",err)
 	}
 
 	reader := csv.NewReader(bufio.NewReader(csvFile))	
-	_ = reader
 	
 	fmt.Printf("Starting TA3 %v\n", "World")
 
@@ -71,7 +72,7 @@ func main() {
 			continue
 		} 
 
-		//fmt.Printf("%v. %v\n",idx, line[8])
+		fmt.Printf("%v. %v\n",idx, line)
 		records = append(records, Record {
 										leadsource: line[0],
 										status: line[1],
@@ -91,8 +92,7 @@ func main() {
     defer db.Close()
 
 
-	//var data [][]string
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source"}}
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Payout"}}
 
     fmt.Println("-------")
 	var max = len(records)
@@ -105,6 +105,10 @@ func main() {
 
 		conn.ConvertsPhone(&phones, records[i].phone)
 		conn.ConvertsPhone(&phones, records[i].mobile)
+
+		if len(phones) == 0 && records[i].email == "" { 
+			continue
+		}
 
 		var results *sql.Rows = conn.SelectRecordfunc(db, phones, records[i].email)
 
@@ -119,7 +123,7 @@ func main() {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, fmt.Sprint(tag.id), tag.firm.String})
+			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, fmt.Sprint(tag.id), tag.firm.String, fmt.Sprint(tag.trans_id), fmt.Sprint(tag.amount)})
 
 		}//for
 
@@ -127,21 +131,11 @@ func main() {
 
     }//for
     
-	//write csv file
+	fmt.Printf("Writes to result.csv. Data total: %v.", len(data))
 	var output string = "ta/result.csv"
-	delete_bool := conn.DeleteFile(&output)
-	if delete_bool {
-		fmt.Println("\nDeletes old result.csv successful.")
-	}
-
-	file, err := os.Create(output)
-    conn.CheckError("Cannot create file", err)
-    defer file.Close()
-	writer := csv.NewWriter(file)
-    defer writer.Flush()
-    
-	fmt.Println("Writes to result.csv.")
-	writer.WriteAll(data)
+	
+	//output records
+	conn.Writefile(&output, data)
     
 }//func
 

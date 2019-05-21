@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 	"database/sql"
+	"encoding/csv"
 )
 
 var re = regexp.MustCompile(`^\((\d{3})\)\s(\d{3})-(\d{4})`)
@@ -49,13 +50,39 @@ func DeleteFile(infile_ptr *string) bool {
 	return false
 }
 
+func Writefile(output_ptr *string, data [][]string) {
+
+	//var output string = " ta/result.csv"
+	delete_bool := DeleteFile(output_ptr)
+	if delete_bool {
+		fmt.Println("\nDeletes old result.csv successful.")
+	}
+
+	//writes csv file
+	file, err := os.Create(*output_ptr)
+    CheckError("Cannot create file", err)
+    defer file.Close()
+	writer := csv.NewWriter(file)
+    defer writer.Flush()
+
+	var idx int = 1 
+	for _, value := range data {
+    	fmt.Printf("%v. Writing %v\n",idx, value)
+		err := writer.Write(value)
+	    CheckError("Cannot write line", err)
+		idx += 1
+	}	
+}
+
+
 func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 	var str string
 	var display string
+	var argument_bool bool = true
+	var results *sql.Rows
 
 	for _, value := range phones {
 		str += value + "," 
-		//str += strconv.Itoa(value) + ","
 	}	
 
 	var sql string = "SELECT lead.id, lead.firstname, lead.lastname, lead.email, lead.phone1, source.name, trans.id, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type," 
@@ -64,15 +91,24 @@ func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 	sql += " INNER JOIN attorney_transaction trans ON lead.id = trans.lead_id" 
 	sql += " INNER JOIN attorney_advertiser adv ON adv.id = trans.advertiser_id" 
 
-	if len(phones) > 0 {
+	if len(phones) > 0 && email != "" {
 		sql += " WHERE lead.email = ? OR lead.phone1 IN (" + str[:len(str)-1] + ")" 
 		display = " WHERE lead.email = ? OR lead.phone1 IN (" + str[:len(str)-1] + ")" 
-	} else {
+	} else if len(phones) > 0 {
+		sql += " WHERE lead.phone1 IN (" + str[:len(str)-1] + ")" 
+		display = " WHERE lead.phone1 IN (" + str[:len(str)-1] + ")" 
+		argument_bool = false 
+	} else if(email != "") {
 		sql += " WHERE lead.email = ?"
 		display = " WHERE lead.email = ?"
-	}
+	} else {
+		sql += " WHERE lead.phone1 IN (11234567777)" 
+		display = " WHERE lead.phone1 IN (11234567777)" 
+	} 
 
 	sql += " ORDER BY lead.created DESC"
+
+	//display query to screen
 	fmt.Printf("\tsql: %v\n", display)
 	
 	stmt, err := db.Prepare(sql)
@@ -80,12 +116,19 @@ func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
         panic(err.Error()) // proper error handling instead of panic in your app
     }
 
-	results, err := stmt.Query(email)
-    if err != nil {
-        panic(err.Error()) // proper error handling instead of panic in your app
-    }
+	//fmt.Println(argument_bool)
+	if argument_bool == true {
+		results, err = stmt.Query(email)
+	} else {
+		results, err = stmt.Query()
+	}
+
+	if err != nil {
+		panic(err.Error()) // proper error handling instead of panic in your app
+	}
 
 	return results
+
 }
 
 func SelectLeadfunc(db *sql.DB, sourceid int) *sql.Rows {
