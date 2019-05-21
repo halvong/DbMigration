@@ -85,9 +85,10 @@ func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 		str += value + "," 
 	}	
 
-	var sql string = "SELECT lead.id AS lead_id, lead.firstname, lead.lastname, lead.email, lead.phone1, source.name AS sourcename, trans.id AS trans_id, trans.created AS trans_created, trans.advertiser_id," 
-	sql += " trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.firm" 
+	var sql string = "SELECT lead.id AS lead_id, lead.firstname, lead.lastname, lead.email, lead.phone1, area.name as practice, source.name AS sourcename, trans.id AS trans_id," 
+	sql += " trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.firm" 
 	sql += " FROM attorney_lead lead" 
+	sql += " INNER JOIN attorney_area area ON lead.area_id = area.id" 
 	sql += " INNER JOIN attorney_leadsource source ON lead.source_id = source.id"
 	sql += " INNER JOIN attorney_transaction trans ON lead.id = trans.lead_id" 
 	sql += " INNER JOIN attorney_advertiser adv ON adv.id = trans.advertiser_id" 

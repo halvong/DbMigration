@@ -32,6 +32,7 @@ type Lead struct {
     lastname string `json:"lastname"`	
     email sql.NullString `json:"email"`	
     phone1 sql.NullString `json:"phone1"`	
+    practice sql.NullString `json:"practice"`	
     sourcename sql.NullString `json:"sourcename"`	
     trans_id uint32 `json:"id"`	
     trans_created sql.NullString `json:"trans_created"`	
@@ -109,7 +110,7 @@ func main() {
 	var db *sql.DB = conn.Connectfunc("LIVE")
     defer db.Close()
 
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Transaction Date", "Payout", "firm"}}
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Practice", "Lead Source", "Transaction", "Transaction Date", "Payout", "firm"}}
 
     fmt.Println("-------")
 	var max = len(records)
@@ -129,11 +130,12 @@ func main() {
 
 		var results *sql.Rows = conn.SelectRecordfunc(db, phones, records[i].email)
 
-		for results.Next() {
+		for results.Next() {//iterate over the rows
 
 			var tag Lead 
 
-			err := results.Scan(&tag.lead_id, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.sourcename, &tag.trans_id, 
+			//reads the columns in each row into variable lead with rows.Scan().
+			err := results.Scan(&tag.lead_id, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.practice, &tag.sourcename, &tag.trans_id, 
 							    &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type,
 								&tag.partner_type, &tag.firm)
 
@@ -143,7 +145,8 @@ func main() {
 
 			//"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Transaction Date", "Payout", "firm"
 			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, 
-						  records[i].phone, records[i].email, fmt.Sprint(tag.lead_id), tag.sourcename.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), tag.firm.String})
+						  records[i].phone, records[i].email, fmt.Sprint(tag.lead_id), tag.practice.String, tag.sourcename.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, 
+						  fmt.Sprint(tag.amount), tag.firm.String})
 
 		}//for
 
