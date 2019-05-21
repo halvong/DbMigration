@@ -27,12 +27,12 @@ type Record struct {
 }
 
 type Lead struct {
-	id uint32 `json:"id"`
+	lead_id uint32 `json:"lead_id"`
     firstname string `json:"firstname"`	
     lastname string `json:"lastname"`	
     email sql.NullString `json:"email"`	
     phone1 sql.NullString `json:"phone1"`	
-    name sql.NullString `json:"name"`	
+    sourcename sql.NullString `json:"sourcename"`	
     trans_id uint32 `json:"id"`	
     trans_created sql.NullString `json:"trans_created"`	
     advertiser_id uint32 `json:"advertiser_id"`	
@@ -44,15 +44,19 @@ type Lead struct {
 }
 
 func main() {
-
-	current := time.Now()
 	var records []Record
+	current := time.Now()
+
+	//inputfile
 	var csvFile, err = os.Open("ta/data/ta3.csv")//full records
 	//var csvFile, err = os.Open("ta/data/ta5.csv")//32 records
 	//var csvFile, err = os.Open("ta/data/ta4.csv")//few records
 
 	//logs
-	fp, logerr := os.OpenFile("ta/logs/log_" + current.Format("2006-01-02")+".txt", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
+	var logfile = "ta/logs/log_" + current.Format("2006-01-02")+".txt"
+	conn.DeleteFile(&logfile)
+
+	fp, logerr := os.OpenFile(logfile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
 	if logerr != nil {
 		panic(logerr)
 	}
@@ -67,7 +71,7 @@ func main() {
 	//body
 	header := "Starting TA3" 
 	fmt.Printf("%v\n", header)
-	log.Printf("%v\n",header)
+	log.Printf("%v\n", header)
 
 	reader := csv.NewReader(bufio.NewReader(csvFile))	
 	var idx int = 0 
@@ -102,10 +106,10 @@ func main() {
 		idx += 1
 	}
 
-	var db *sql.DB = conn.Connectfunc("QA")
+	var db *sql.DB = conn.Connectfunc("LIVE")
     defer db.Close()
 
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Transaction Date", "Payout"}}
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Transaction Date", "Payout", "firm"}}
 
     fmt.Println("-------")
 	var max = len(records)
@@ -129,7 +133,7 @@ func main() {
 
 			var tag Lead 
 
-			err := results.Scan(&tag.id, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.name, &tag.trans_id, 
+			err := results.Scan(&tag.lead_id, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.sourcename, &tag.trans_id, 
 							    &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type,
 								&tag.partner_type, &tag.firm)
 
@@ -137,7 +141,9 @@ func main() {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, fmt.Sprint(tag.id), tag.firm.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount)})
+			//"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Transaction Date", "Payout", "firm"
+			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, 
+						  records[i].phone, records[i].email, fmt.Sprint(tag.lead_id), tag.sourcename.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), tag.firm.String})
 
 		}//for
 
