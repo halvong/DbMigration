@@ -4,6 +4,8 @@ import (
     "fmt"
     "io"
     "os"
+	"log"
+	"time"
     "bufio"
     "encoding/csv"
 	_"strconv"
@@ -32,6 +34,7 @@ type Lead struct {
     phone1 sql.NullString `json:"phone1"`	
     name sql.NullString `json:"name"`	
     trans_id uint32 `json:"id"`	
+    trans_created sql.NullString `json:"trans_created"`	
     advertiser_id uint32 `json:"advertiser_id"`	
     amount float32 `json:"amount"`	
     new_balance float32 `json:"new_balance"`	
@@ -41,21 +44,32 @@ type Lead struct {
 }
 
 func main() {
-	 
+
+	current := time.Now()
 	var records []Record
+	var csvFile, err = os.Open("ta/data/ta3.csv")//full records
+	//var csvFile, err = os.Open("ta/data/ta5.csv")//32 records
+	//var csvFile, err = os.Open("ta/data/ta4.csv")//few records
 
-	csvFile, err := os.Open("ta/data/ta3.csv")//full records
-	//csvFile, err := os.Open("ta/data/ta5.csv")//32 records
-	//csvFile, err := os.Open("ta/data/ta4.csv")//few records
+	//logs
+	fp, logerr := os.OpenFile("ta/logs/log_" + current.Format("2006-01-02")+".txt", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
+	if logerr != nil {
+		panic(logerr)
+	}
+	log.SetOutput(fp)
 
+	//output
+	var output string = "ta/results/result_"+current.Format("2006-01-02")+".csv"
 	if err != nil {
 		fmt.Println("Bad. Cannot open file:",err)
 	}
 
-	reader := csv.NewReader(bufio.NewReader(csvFile))	
-	
-	fmt.Printf("Starting TA3 %v\n", "World")
+	//body
+	header := "Starting TA3" 
+	fmt.Printf("%v\n", header)
+	log.Printf("%v\n",header)
 
+	reader := csv.NewReader(bufio.NewReader(csvFile))	
 	var idx int = 0 
 	for {
 		
@@ -72,7 +86,7 @@ func main() {
 			continue
 		} 
 
-		fmt.Printf("%v. %v\n",idx, line)
+		//fmt.Printf("%v. %v\n",idx, line)//TEST
 		records = append(records, Record {
 										leadsource: line[0],
 										status: line[1],
@@ -91,8 +105,7 @@ func main() {
 	var db *sql.DB = conn.Connectfunc("QA")
     defer db.Close()
 
-
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Payout"}}
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Transaction Date", "Payout"}}
 
     fmt.Println("-------")
 	var max = len(records)
@@ -116,14 +129,15 @@ func main() {
 
 			var tag Lead 
 
-			err := results.Scan(&tag.id, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.name, &tag.trans_id, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type,
+			err := results.Scan(&tag.id, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.name, &tag.trans_id, 
+							    &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type,
 								&tag.partner_type, &tag.firm)
 
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, fmt.Sprint(tag.id), tag.firm.String, fmt.Sprint(tag.trans_id), fmt.Sprint(tag.amount)})
+			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, fmt.Sprint(tag.id), tag.firm.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount)})
 
 		}//for
 
@@ -131,10 +145,8 @@ func main() {
 
     }//for
     
-	fmt.Printf("Writes to result.csv. Data total: %v.", len(data))
-	var output string = "ta/result.csv"
-	
 	//output records
+	
 	conn.Writefile(&output, data)
     
 }//func

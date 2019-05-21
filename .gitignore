@@ -3,6 +3,8 @@
 
 ### Eclipse ###
 logfile
+result_*.csv
+log_*.txt
 .metadata
 bin/
 tmp/

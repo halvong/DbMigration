@@ -52,11 +52,11 @@ func DeleteFile(infile_ptr *string) bool {
 
 func Writefile(output_ptr *string, data [][]string) {
 
-	//var output string = " ta/result.csv"
 	delete_bool := DeleteFile(output_ptr)
 	if delete_bool {
 		fmt.Println("\nDeletes old result.csv successful.")
 	}
+	fmt.Printf("\nWrites to %v. Data total: %v.", *output_ptr, len(data))
 
 	//writes csv file
 	file, err := os.Create(*output_ptr)
@@ -67,7 +67,7 @@ func Writefile(output_ptr *string, data [][]string) {
 
 	var idx int = 1 
 	for _, value := range data {
-    	fmt.Printf("%v. Writing %v\n",idx, value)
+    	log.Printf("%v. Writing %v\n",idx, value)//TEST
 		err := writer.Write(value)
 	    CheckError("Cannot write line", err)
 		idx += 1
@@ -85,7 +85,7 @@ func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 		str += value + "," 
 	}	
 
-	var sql string = "SELECT lead.id, lead.firstname, lead.lastname, lead.email, lead.phone1, source.name, trans.id, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type," 
+	var sql string = "SELECT lead.id, lead.firstname, lead.lastname, lead.email, lead.phone1, source.name, trans.id, trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type," 
 	sql += " trans.partner_type, adv.firm FROM attorney_lead lead" 
 	sql += " INNER JOIN attorney_leadsource source ON lead.source_id = source.id"
 	sql += " INNER JOIN attorney_transaction trans ON lead.id = trans.lead_id" 
