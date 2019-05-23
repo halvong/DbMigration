@@ -85,7 +85,8 @@ func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 		str += value + "," 
 	}	
 
-	var sql string = "SELECT lead.id AS lead_id, lead.firstname, lead.lastname, lead.email, lead.phone1, area.name as practice, source.name AS sourcename, trans.id AS trans_id," 
+	var sql string = "SELECT lead.id AS lead_id, lead.valid, lead.firstname, lead.lastname, lead.email, lead.phone1, lead.city, lead.state, lead.zipcode, lead.county, lead.contested, lead.rejected_reason," 
+	sql += " lead.lead_type, lead.price, lead.cost, lead.status, lead.direction, lead.tcpa_opted_in, lead.subid, lead.appointment, lead.comments, lead.created AS lead_created, area.name as practice, source.name AS sourcename, trans.id AS trans_id," 
 	sql += " trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.firm" 
 	sql += " FROM attorney_lead lead" 
 	sql += " INNER JOIN attorney_area area ON lead.area_id = area.id" 
@@ -104,8 +105,8 @@ func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 		sql += " WHERE lead.email = ?"
 		display = " WHERE lead.email = ?"
 	} else {
-		sql += " WHERE lead.phone1 IN (11234567777)" 
-		display = " WHERE lead.phone1 IN (11234567777)" 
+		sql += " WHERE lead.phone1 = 0" 
+		display = " WHERE lead.phone1 = 0" 
 	} 
 
 	sql += " ORDER BY lead.created DESC"
@@ -131,20 +132,4 @@ func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 
 	return results
 
-}
-
-func SelectLeadfunc(db *sql.DB, sourceid int) *sql.Rows {
-	
-	stmt, err := db.Prepare("SELECT id, firstname, lastname, email, contested, rejected_reason, status, price, area_id, source_id, advertisement_id, upright_law_api_response, created from attorney_lead WHERE advertisement_id = ? ORDER BY created DESC LIMIT 10")
-
-    if err != nil {
-        panic(err.Error()) // proper error handling instead of panic in your app
-    }
-
-	results, err := stmt.Query(sourceid)
-    if err != nil {
-        panic(err.Error()) // proper error handling instead of panic in your app
-    }
-
-	return results
 }

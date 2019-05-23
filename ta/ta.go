@@ -26,12 +26,30 @@ type Record struct {
 	email string `json:"email,omitempty"`		
 }
 
+//TEST2
 type Lead struct {
 	lead_id uint32 `json:"lead_id"`
+    valid bool `json:"valid"`	
     firstname string `json:"firstname"`	
     lastname string `json:"lastname"`	
     email sql.NullString `json:"email"`	
     phone1 sql.NullString `json:"phone1"`	
+	city sql.NullString `json:"city"`	
+	state sql.NullString `json:"state"`	
+	zipcode sql.NullString `json:"zipcode"`	
+	county sql.NullString `json:"county"`	
+	contested sql.NullString `json:"contested"`	
+	rejected_reason sql.NullString `json:"rejected_reason"`	
+	lead_type sql.NullString `json:"contested"`	
+	price float32 `json:"amount"`	
+	cost float32 `json:"amount"`	
+	status sql.NullString `json:"contested"`	
+	direction sql.NullString `json:"contested"`	
+	tcpa_opted_in sql.NullString `json:"contested"`	
+	subid sql.NullString `json:"contested"`	
+	comments sql.NullString `json:"contested"`	
+	appointment sql.NullString `json:"appointment"`	
+    lead_created sql.NullString `json:"lead_created"`	
     practice sql.NullString `json:"practice"`	
     sourcename sql.NullString `json:"sourcename"`	
     trans_id uint32 `json:"id"`	
@@ -48,10 +66,11 @@ func main() {
 	var records []Record
 	current := time.Now()
 
+	//TEST1
 	//inputfile
-	var csvFile, err = os.Open("ta/data/ta3.csv")//full records
+	//var csvFile, err = os.Open("ta/data/ta3.csv")//full records
 	//var csvFile, err = os.Open("ta/data/ta5.csv")//32 records
-	//var csvFile, err = os.Open("ta/data/ta4.csv")//few records
+	var csvFile, err = os.Open("ta/data/ta4.csv")//few records
 
 	//logs
 	var logfile = "ta/logs/log_" + current.Format("2006-01-02")+".txt"
@@ -107,10 +126,11 @@ func main() {
 		idx += 1
 	}
 
-	var db *sql.DB = conn.Connectfunc("LIVE")
+	var db *sql.DB = conn.Connectfunc("QA")
     defer db.Close()
 
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Practice", "Lead Source", "Transaction", "Transaction Date", "Payout", "firm"}}
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Practice", "Lead Source", "Transaction", "Transaction Date", "Payout", 
+						   "firm","Valid, "}}
 
     fmt.Println("-------")
 	var max = len(records)
@@ -131,22 +151,25 @@ func main() {
 		var results *sql.Rows = conn.SelectRecordfunc(db, phones, records[i].email)
 
 		for results.Next() {//iterate over the rows
-
+	
 			var tag Lead 
 
+			//TEST3
 			//reads the columns in each row into variable lead with rows.Scan().
-			err := results.Scan(&tag.lead_id, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.practice, &tag.sourcename, &tag.trans_id, 
-							    &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type,
-								&tag.partner_type, &tag.firm)
+			err := results.Scan(&tag.lead_id, &tag.valid, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.city, &tag.state, &tag.zipcode, &tag.county, &tag.contested, &tag.rejected_reason, 
+								&tag.lead_type, &tag.price, &tag.cost, &tag.status, &tag.direction, &tag.tcpa_opted_in, &tag.subid, &tag.appointment, &tag.comments, &tag.lead_created, &tag.practice, 
+								&tag.sourcename, &tag.trans_id, &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type, &tag.partner_type, &tag.firm)
 
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-			//"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Lead Source", "Transaction", "Transaction Date", "Payout", "firm"
-			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, 
-						  records[i].phone, records[i].email, fmt.Sprint(tag.lead_id), tag.practice.String, tag.sourcename.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, 
-						  fmt.Sprint(tag.amount), tag.firm.String})
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Practice", "Lead Source", "Transaction", "Transaction Date", "Payout", 
+						   "firm","Valid","Lead Status",""}}
+			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, 
+						  fmt.Sprint(tag.lead_id), fmt.Sprint(tag.valid), tag.contested.String, tag.rejected_reason.String, tag.lead_type.String, fmt.Sprint(tag.price), fmt.Sprint(tag.cost), tag.status.String, 
+						  tag.city.String, tag.state.String, tag.zipcode.String, tag.county.String, tag.direction.String, tag.tcpa_opted_in.String, tag.comments.String, tag.lead_created.String, 
+						  tag.practice.String, tag.sourcename.String, tag.subid.String, tag.appointment.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), tag.firm.String})
 
 		}//for
 

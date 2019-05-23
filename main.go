@@ -5,21 +5,26 @@ writes - output after modification
 hot - files ready for import
 */
 import (
-	 "fmt"
-	 "log"
-	 "os"
-	 cc "DbMigration/libraries"
+	"fmt"
+	"log"
+	"os"
+	"time"
+	cc "DbMigration/libraries"
 )
 
+var delete_infile_bool bool = true
 var which string = "migrate" 
 var reads_dir string = "/home/hal/dumps/reads"
 var writes_dir string = "/home/hal/dumps/hot"
 	
 func main() {
-	//TEST2
 	which = "check" 
+	current := time.Now()
+
 	var hot_dir string = writes_dir
 	var files []string 
+
+	var logfile = "logs/log_" + current.Format("2006-01-02")+".txt"
 
 	//logging
 	fp, logerr := os.OpenFile("logfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
@@ -28,10 +33,8 @@ func main() {
 		panic(logerr)
 	}
 
-	var delete_infile_bool bool = true
-
 	//deletes logfile
-	//cc.DeleteFile("logfile")
+	cc.DeleteFile(&logfile)
 	
 	log.SetOutput(fp)
 	fmt.Printf("\n%v", "Starts processing sql files")
