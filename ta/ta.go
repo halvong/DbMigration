@@ -68,9 +68,9 @@ func main() {
 
 	//TEST1
 	//inputfile
-	//var csvFile, err = os.Open("ta/data/ta3.csv")//full records
+	var csvFile, err = os.Open("ta/data/ta3.csv")//full records
 	//var csvFile, err = os.Open("ta/data/ta5.csv")//32 records
-	var csvFile, err = os.Open("ta/data/ta4.csv")//few records
+	//var csvFile, err = os.Open("ta/data/ta4.csv")//few records
 
 	//logs
 	var logfile = "ta/logs/log_" + current.Format("2006-01-02")+".txt"
@@ -126,11 +126,12 @@ func main() {
 		idx += 1
 	}
 
-	var db *sql.DB = conn.Connectfunc("QA")
+	var db *sql.DB = conn.Connectfunc("LIVE")
     defer db.Close()
 
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Practice", "Lead Source", "Transaction", "Transaction Date", "Payout", 
-						   "firm","Valid, "}}
+	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID","Valid","Lead Status","Contested","Rejected Reason","Lead Type",
+							"Price","Cost","City","State","Zipcode","County","Direction","TCPA","Comments","Lead Created","Practice","Lead Source", "Subid","Appointment","Transaction Id","Transaction Created",
+							"Transaction Amount","Firm"}}
 
     fmt.Println("-------")
 	var max = len(records)
@@ -148,7 +149,7 @@ func main() {
 			continue
 		}
 
-		var results *sql.Rows = conn.SelectRecordfunc(db, phones, records[i].email)
+		var results *sql.Rows = conn.SelectFromListfunc(db, phones, records[i].email)
 
 		for results.Next() {//iterate over the rows
 	
@@ -164,10 +165,9 @@ func main() {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID", "Practice", "Lead Source", "Transaction", "Transaction Date", "Payout", 
-						   "firm","Valid","Lead Status",""}}
+
 			data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, 
-						  fmt.Sprint(tag.lead_id), fmt.Sprint(tag.valid), tag.contested.String, tag.rejected_reason.String, tag.lead_type.String, fmt.Sprint(tag.price), fmt.Sprint(tag.cost), tag.status.String, 
+						  fmt.Sprint(tag.lead_id), fmt.Sprint(tag.valid), tag.status.String, tag.contested.String, tag.rejected_reason.String, tag.lead_type.String, fmt.Sprint(tag.price), fmt.Sprint(tag.cost), 
 						  tag.city.String, tag.state.String, tag.zipcode.String, tag.county.String, tag.direction.String, tag.tcpa_opted_in.String, tag.comments.String, tag.lead_created.String, 
 						  tag.practice.String, tag.sourcename.String, tag.subid.String, tag.appointment.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), tag.firm.String})
 
@@ -178,11 +178,9 @@ func main() {
     }//for
     
 	//output records
-	
 	conn.Writefile(&output, data)
     
 }//func
 
-//misc
 
 

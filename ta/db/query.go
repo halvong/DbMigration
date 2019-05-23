@@ -75,7 +75,66 @@ func Writefile(output_ptr *string, data [][]string) {
 }
 
 
-func SelectRecordfunc(db *sql.DB, phones []string, email string) *sql.Rows {
+func SelectFromTXfunc(db *sql.DB, phones []string, email string) *sql.Rows {
+	var str string
+	var display string
+	var argument_bool bool = true
+	var results *sql.Rows
+
+	for _, value := range phones {
+		str += value + "," 
+	}	
+
+	var sql string = "SELECT lead.id AS lead_id, lead.valid, lead.firstname, lead.lastname, lead.email, lead.phone1, lead.city, lead.state, lead.zipcode, lead.county, lead.contested, lead.rejected_reason," 
+	sql += " lead.lead_type, lead.price, lead.cost, lead.status, lead.direction, lead.tcpa_opted_in, lead.subid, lead.appointment, lead.comments, lead.created AS lead_created, area.name as practice, source.name AS sourcename, trans.id AS trans_id," 
+	sql += " trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.firm" 
+	sql += " FROM attorney_lead lead" 
+	sql += " INNER JOIN attorney_area area ON lead.area_id = area.id" 
+	sql += " INNER JOIN attorney_leadsource source ON lead.source_id = source.id"
+	sql += " INNER JOIN attorney_transaction trans ON lead.id = trans.lead_id" 
+	sql += " INNER JOIN attorney_advertiser adv ON adv.id = trans.advertiser_id" 
+
+	if len(phones) > 0 && email != "" {
+		sql += " WHERE lead.email = ? OR lead.phone1 IN (" + str[:len(str)-1] + ")" 
+		display = " WHERE lead.email = ? OR lead.phone1 IN (" + str[:len(str)-1] + ")" 
+	} else if len(phones) > 0 {
+		sql += " WHERE lead.phone1 IN (" + str[:len(str)-1] + ")" 
+		display = " WHERE lead.phone1 IN (" + str[:len(str)-1] + ")" 
+		argument_bool = false 
+	} else if(email != "") {
+		sql += " WHERE lead.email = ?"
+		display = " WHERE lead.email = ?"
+	} else {
+		sql += " WHERE lead.phone1 = 0" 
+		display = " WHERE lead.phone1 = 0" 
+	} 
+
+	sql += " ORDER BY lead.created DESC"
+
+	//display query to screen
+	fmt.Printf("\tsql: %v\n", display)
+	
+	stmt, err := db.Prepare(sql)
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+
+	//fmt.Println(argument_bool)
+	if argument_bool == true {
+		results, err = stmt.Query(email)
+	} else {
+		results, err = stmt.Query()
+	}
+
+	if err != nil {
+		panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	return results
+
+}
+
+func SelectFromListfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 	var str string
 	var display string
 	var argument_bool bool = true
