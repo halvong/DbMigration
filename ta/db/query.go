@@ -72,18 +72,13 @@ func Writefile(output_ptr *string, data [][]string) {
 	    CheckError("Cannot write line", err)
 		idx += 1
 	}	
+
+	fmt.Printf("\nDone writing. Data total: %v.", len(data))
 }
 
 
-func SelectFromTXfunc(db *sql.DB, phones []string, email string) *sql.Rows {
-	var str string
-	var display string
-	var argument_bool bool = true
+func SelectFromTXfunc(db *sql.DB) *sql.Rows {
 	var results *sql.Rows
-
-	for _, value := range phones {
-		str += value + "," 
-	}	
 
 	var sql string = "SELECT lead.id AS lead_id, lead.valid, lead.firstname, lead.lastname, lead.email, lead.phone1, lead.city, lead.state, lead.zipcode, lead.county, lead.contested, lead.rejected_reason," 
 	sql += " lead.lead_type, lead.price, lead.cost, lead.status, lead.direction, lead.tcpa_opted_in, lead.subid, lead.appointment, lead.comments, lead.created AS lead_created, area.name as practice, source.name AS sourcename, trans.id AS trans_id," 
@@ -93,45 +88,24 @@ func SelectFromTXfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 	sql += " INNER JOIN attorney_leadsource source ON lead.source_id = source.id"
 	sql += " INNER JOIN attorney_transaction trans ON lead.id = trans.lead_id" 
 	sql += " INNER JOIN attorney_advertiser adv ON adv.id = trans.advertiser_id" 
-
-	if len(phones) > 0 && email != "" {
-		sql += " WHERE lead.email = ? OR lead.phone1 IN (" + str[:len(str)-1] + ")" 
-		display = " WHERE lead.email = ? OR lead.phone1 IN (" + str[:len(str)-1] + ")" 
-	} else if len(phones) > 0 {
-		sql += " WHERE lead.phone1 IN (" + str[:len(str)-1] + ")" 
-		display = " WHERE lead.phone1 IN (" + str[:len(str)-1] + ")" 
-		argument_bool = false 
-	} else if(email != "") {
-		sql += " WHERE lead.email = ?"
-		display = " WHERE lead.email = ?"
-	} else {
-		sql += " WHERE lead.phone1 = 0" 
-		display = " WHERE lead.phone1 = 0" 
-	} 
-
+	sql += " WHERE YEAR(lead.created)=2019 AND MONTH(lead.created)=4 AND lead.state IN ('TX','tx')"
 	sql += " ORDER BY lead.created DESC"
 
 	//display query to screen
-	fmt.Printf("\tsql: %v\n", display)
+	log.Printf("\tsql: %v\n", sql)
 	
 	stmt, err := db.Prepare(sql)
     if err != nil {
         panic(err.Error()) // proper error handling instead of panic in your app
     }
 
-	//fmt.Println(argument_bool)
-	if argument_bool == true {
-		results, err = stmt.Query(email)
-	} else {
-		results, err = stmt.Query()
-	}
+	results, err = stmt.Query()
 
 	if err != nil {
 		panic(err.Error()) // proper error handling instead of panic in your app
 	}
 
 	return results
-
 }
 
 func SelectFromListfunc(db *sql.DB, phones []string, email string) *sql.Rows {
