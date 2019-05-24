@@ -82,7 +82,7 @@ func SelectFromTXfunc(db *sql.DB) *sql.Rows {
 
 	var sql string = "SELECT lead.id AS lead_id, lead.valid, lead.firstname, lead.lastname, lead.email, lead.phone1, lead.city, lead.state, lead.zipcode, lead.county, lead.contested, lead.rejected_reason," 
 	sql += " lead.lead_type, lead.price, lead.cost, lead.status, lead.direction, lead.tcpa_opted_in, lead.subid, lead.appointment, lead.comments, lead.created AS lead_created, area.name as practice, source.name AS sourcename, trans.id AS trans_id," 
-	sql += " trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.firm" 
+	sql += " trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.id AS firm_id, adv.firstname AS firm_first, adv.lastname AS firm_last, adv.firm" 
 	sql += " FROM attorney_lead lead" 
 	sql += " INNER JOIN attorney_area area ON lead.area_id = area.id" 
 	sql += " INNER JOIN attorney_leadsource source ON lead.source_id = source.id"
@@ -120,7 +120,7 @@ func SelectFromListfunc(db *sql.DB, phones []string, email string) *sql.Rows {
 
 	var sql string = "SELECT lead.id AS lead_id, lead.valid, lead.firstname, lead.lastname, lead.email, lead.phone1, lead.city, lead.state, lead.zipcode, lead.county, lead.contested, lead.rejected_reason," 
 	sql += " lead.lead_type, lead.price, lead.cost, lead.status, lead.direction, lead.tcpa_opted_in, lead.subid, lead.appointment, lead.comments, lead.created AS lead_created, area.name as practice, source.name AS sourcename, trans.id AS trans_id," 
-	sql += " trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.firm" 
+	sql += " trans.created AS trans_created, trans.advertiser_id, trans.amount, trans.new_balance, trans.transaction_type, trans.partner_type, adv.id AS firm_id, adv.firstname AS firm_first, adv.lastname AS firm_last, adv.firm"
 	sql += " FROM attorney_lead lead" 
 	sql += " INNER JOIN attorney_area area ON lead.area_id = area.id" 
 	sql += " INNER JOIN attorney_leadsource source ON lead.source_id = source.id"

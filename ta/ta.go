@@ -59,6 +59,9 @@ type Lead struct {
     new_balance float32 `json:"new_balance"`	
     transaction_type sql.NullString `json:"transaction_type"`	
     partner_type sql.NullString `json:"partner_type"`	
+    firm_id uint32 `json:"firm_id"`	
+    firm_first sql.NullString `json:"firm_first"`	
+    firm_last sql.NullString `json:"firm_last"`	
     firm sql.NullString `json:"firm"`	
 }
 
@@ -67,12 +70,9 @@ const WHERE string = "TX"
 
 func main() {
 
-	var records []Record
+	var records []Record //input data from read csv file
 	var output string //output
-
-	var data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID","Valid","Lead Status","Contested","Rejected Reason","Lead Type",
-							"Price","Cost","City","State","Zipcode","County","Direction","TCPA","Comments","Lead Created","Practice","Lead Source", "Subid","Appointment","Transaction Id","Transaction Created",
-							"Transaction Amount","Firm"}}
+	var data [][]string //input data from csv file and database
 
 	//logs
 	current := time.Now()
@@ -92,10 +92,14 @@ func main() {
 
 		output = "ta/results/result_"+current.Format("2006-01-02")+".csv"
 
+		data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID","Valid","Lead Status","Contested","Rejected Reason","Lead Type",
+							"Price","Cost","City","State","Zipcode","County","Direction","TCPA","Comments","Lead Created","Practice","Lead Source", "Subid","Appointment","Transaction Id","Transaction Created",
+							"Transaction Amount","Firm Id (Advertiser)","Firm First Name (Advertiser)","Firm Last Name (Advertiser)","Firm (Advertiser)" }}
+
 		//inputfile
-		var csvFile, err = os.Open("ta/data/ta3.csv")//full records
+		//var csvFile, err = os.Open("ta/data/ta3.csv")//full records
 		//var csvFile, err = os.Open("ta/data/ta5.csv")//32 records
-		//var csvFile, err = os.Open("ta/data/ta4.csv")//few records
+		var csvFile, err = os.Open("ta/data/ta4.csv")//few records
 		if err != nil {
 			fmt.Println("Bad. Cannot open file:",err)
 		}
@@ -167,7 +171,8 @@ func main() {
 				//reads the columns in each row into variable lead with rows.Scan().
 				err := results.Scan(&tag.lead_id, &tag.valid, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.city, &tag.state, &tag.zipcode, &tag.county, &tag.contested, &tag.rejected_reason, 
 									&tag.lead_type, &tag.price, &tag.cost, &tag.status, &tag.direction, &tag.tcpa_opted_in, &tag.subid, &tag.appointment, &tag.comments, &tag.lead_created, &tag.practice, 
-									&tag.sourcename, &tag.trans_id, &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type, &tag.partner_type, &tag.firm)
+									&tag.sourcename, &tag.trans_id, &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type, &tag.partner_type, &tag.firm_id, &tag.firm_first,
+									&tag.firm_last, &tag.firm)
 
 				if err != nil {
 					panic(err.Error()) // proper error handling instead of panic in your app
@@ -177,7 +182,7 @@ func main() {
 				data = append(data, []string{records[i].leadsource, records[i].status, records[i].dateadded, records[i].lastaction, records[i].first, records[i].last, records[i].mobile, records[i].phone, records[i].email, 
 							  fmt.Sprint(tag.lead_id), fmt.Sprint(tag.valid), tag.status.String, tag.contested.String, tag.rejected_reason.String, tag.lead_type.String, fmt.Sprint(tag.price), fmt.Sprint(tag.cost), 
 							  tag.city.String, tag.state.String, tag.zipcode.String, tag.county.String, tag.direction.String, tag.tcpa_opted_in.String, tag.comments.String, tag.lead_created.String, 
-							  tag.practice.String, tag.sourcename.String, tag.subid.String, tag.appointment.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), tag.firm.String})
+							  tag.practice.String, tag.sourcename.String, tag.subid.String, tag.appointment.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), fmt.Sprint(tag.firm_id), tag.firm_first.String, tag.firm_last.String, tag.firm.String})
 
 			}//for
 
@@ -187,10 +192,11 @@ func main() {
 		
 	} else {
 
-		output = "ta/results/state_"+current.Format("2006-01-02")+".csv"
-
 		data = [][]string{{"Lead ID","Valid","Lead Status","Contested","Rejected Reason","Lead Type", "Price","Cost","City","State","Zipcode","County","Direction","TCPA","Comments","Lead Created","Practice",
-							"Lead Source", "Subid","Appointment","Transaction Id","Transaction Created", "Transaction Amount","Firm"}}
+							"Lead Source", "Subid","Appointment","Transaction Id","Transaction Created", "Transaction Amount", "Firm Id (Advertiser)","Firm First Name (Advertiser)","Firm Last Name (Advertiser)",
+							"Firm (Advertiser)" }}
+
+		output = "ta/results/state_"+current.Format("2006-01-02")+".csv"
 
 		var results *sql.Rows = conn.SelectFromTXfunc(db)
 	
@@ -201,7 +207,8 @@ func main() {
 			//reads the columns in each row into variable lead with rows.Scan().
 			err := results.Scan(&tag.lead_id, &tag.valid, &tag.firstname, &tag.lastname, &tag.email, &tag.phone1, &tag.city, &tag.state, &tag.zipcode, &tag.county, &tag.contested, &tag.rejected_reason, 
 								&tag.lead_type, &tag.price, &tag.cost, &tag.status, &tag.direction, &tag.tcpa_opted_in, &tag.subid, &tag.appointment, &tag.comments, &tag.lead_created, &tag.practice, 
-								&tag.sourcename, &tag.trans_id, &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type, &tag.partner_type, &tag.firm)
+								&tag.sourcename, &tag.trans_id, &tag.trans_created, &tag.advertiser_id, &tag.amount, &tag.new_balance, &tag.transaction_type, &tag.partner_type, &tag.firm_id, &tag.firm_first, &tag.firm_last, 
+								&tag.firm)
 
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
@@ -209,7 +216,7 @@ func main() {
 
 			data = append(data, []string{fmt.Sprint(tag.lead_id), fmt.Sprint(tag.valid), tag.status.String, tag.contested.String, tag.rejected_reason.String, tag.lead_type.String, fmt.Sprint(tag.price), fmt.Sprint(tag.cost), 
 						  tag.city.String, tag.state.String, tag.zipcode.String, tag.county.String, tag.direction.String, tag.tcpa_opted_in.String, tag.comments.String, tag.lead_created.String, 
-						  tag.practice.String, tag.sourcename.String, tag.subid.String, tag.appointment.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), tag.firm.String})
+						  tag.practice.String, tag.sourcename.String, tag.subid.String, tag.appointment.String, fmt.Sprint(tag.trans_id), tag.trans_created.String, fmt.Sprint(tag.amount), fmt.Sprint(tag.firm_id), tag.firm_first.String, tag.firm_last.String, tag.firm.String})		  
 
 		}//for
 	

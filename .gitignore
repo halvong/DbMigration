@@ -4,6 +4,7 @@
 ### Eclipse ###
 logfile
 result_*.csv
+state_*.csv
 log_*.txt
 .metadata
 bin/
