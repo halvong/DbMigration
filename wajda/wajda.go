@@ -10,7 +10,7 @@ import (
     "encoding/csv"
 	_"strconv"
 	"database/sql"
-    conn "DbMigration/ta/db"
+    conn "DbMigration/wajda/db"
 )
 
 
@@ -30,8 +30,8 @@ type Record struct {
 type Lead struct {
 	lead_id uint32 `json:"lead_id"`
     valid bool `json:"valid"`	
-    firstname string `json:"firstname"`	
-    lastname string `json:"lastname"`	
+    firstname sql.NullString `json:"firstname"`	
+    lastname sql.NullString `json:"lastname"`	
     email sql.NullString `json:"email"`	
     phone1 sql.NullString `json:"phone1"`	
 	city sql.NullString `json:"city"`	
@@ -66,7 +66,7 @@ type Lead struct {
 }
 
 //const where string = "LIST"
-//const WHERE string = "TX"
+const WHERE string = "CUSTOM"
 
 func main() {
 
@@ -76,7 +76,7 @@ func main() {
 
 	//logs
 	current := time.Now()
-	var logfile = "ta/logs/log_" + current.Format("2006-01-02")+".txt"
+	var logfile = "wajda/logs/log_" + current.Format("2006-01-02")+".txt"
 	conn.DeleteFile(&logfile)
 
 	//db connection
@@ -90,7 +90,7 @@ func main() {
 
 	if WHERE == "LIST" {
 
-		output = "ta/results/result_"+current.Format("2006-01-02")+".csv"
+		output = "wajda/results/result_"+current.Format("2006-01-02")+".csv"
 
 		data = [][]string{{"Lead Source","Status","Date Added","Last Action Note","First Name","Last Name","Mobile Phone","Home Phone","Email","Lead ID","Valid","Lead Status","Contested","Rejected Reason","Lead Type",
 							"Price","Cost","City","State","Zipcode","County","Direction","TCPA","Comments","Lead Created","Practice","Lead Source", "Subid","Appointment","Transaction Id","Transaction Created",
@@ -196,9 +196,9 @@ func main() {
 							"Lead Source", "Subid","Appointment","Transaction Id","Transaction Created", "Transaction Amount", "Firm Id (Advertiser)","Firm First Name (Advertiser)","Firm Last Name (Advertiser)",
 							"Firm (Advertiser)" }}
 
-		output = "ta/results/state_"+current.Format("2006-01-02")+".csv"
+		output = "wajda/results/wajda_"+current.Format("2006-01-02")+".csv"
 
-		var results *sql.Rows = conn.SelectFromTXfunc(db)
+		var results *sql.Rows = conn.SelectFromAdvertiserfunc(db, 2125, 2019)
 	
 		for results.Next() {//iterate over the rows
 

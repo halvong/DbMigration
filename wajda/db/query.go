@@ -67,7 +67,7 @@ func Writefile(output_ptr *string, data [][]string) {
 
 	var idx int = 1 
 	for _, value := range data {
-    	log.Printf("%v. Writing %v\n",idx, value)//TEST
+    	//log.Printf("%v. Writing %v\n",idx, value)//TEST
 		err := writer.Write(value)
 	    CheckError("Cannot write line", err)
 		idx += 1
@@ -76,9 +76,7 @@ func Writefile(output_ptr *string, data [][]string) {
 	fmt.Printf("\nDone writing. Data total: %v.", len(data))
 }
 
-func SelectFromAdvertiserfunc(db *sql.DB, iid string, year string) *sql.Rows {
-	var str string
-	var display string
+func SelectFromAdvertiserfunc(db *sql.DB, iid int, year int) *sql.Rows {
 	var argument_bool bool = true
 	var results *sql.Rows
 
