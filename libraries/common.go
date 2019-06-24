@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	_ "io/ioutil"
-	_ "regexp"
+	"regexp"
 	"path/filepath"
 )
 
@@ -13,7 +13,13 @@ func WalkFiles(dir_reads string) []string {
 	var files []string
 
 	err := filepath.Walk(dir_reads, func(path string, info os.FileInfo, err error) error {
-        files = append(files, path)
+
+		match, _ := regexp.MatchString("\\.sql$", path)
+
+		if match {
+	        files = append(files, path)
+		}
+
         return nil
     })	
 

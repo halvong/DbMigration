@@ -45,11 +45,22 @@ func main() {
 	var result bool = false  
 
 	if which == "migrate" {
+
 		files = cc.WalkFiles(reads_dir)//returns file from directory
-		result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir)
-	} else {
+		if(len(files) > 0) {
+			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir)
+		} else {
+			fmt.Println("\tNo file found")
+		}
+
+	} else {//check
+
 		files = cc.WalkFiles(hot_dir)//returns file from directory
-		result = cc.RegexVerifyHotfunc(&files)
+		if(len(files) > 0) {
+			result = cc.RegexVerifyHotfunc(&files)
+		} else {
+			fmt.Println("\tNo file found")
+		}
 	}
 
 	if result == false {

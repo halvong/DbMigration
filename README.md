@@ -1,5 +1,5 @@
 DbMigration, Golang, working ubuntu
-6/24 Mon 
+6/04 Tues
 
 Add mysql connection code
 
