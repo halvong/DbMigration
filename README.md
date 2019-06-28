@@ -1,7 +1,7 @@
 DbMigration, Golang, working ubuntu
-6/27 Thurs
+6/28 Fri
 
-Add mysql connection code
+Modify migration code
 
 #path
 cd /home/hal/Documents/softwares/eclipse_golang/workspace/src/DbMigration

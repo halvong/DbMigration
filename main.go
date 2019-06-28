@@ -12,12 +12,16 @@ import (
 	cc "DbMigration/libraries"
 )
 
-var delete_infile_bool bool = true
-var which string = "migrate" 
+var which string = "migrate" //default
+
+var copy_dir string = "/home/hal/dumps/Dump20190628"
 var reads_dir string = "/home/hal/dumps/reads"
 var writes_dir string = "/home/hal/dumps/hot"
+
+var delete_infile_bool bool = true
 	
 func main() {
+	//which = "copy" 
 	which = "check" 
 	current := time.Now()
 
@@ -25,26 +29,37 @@ func main() {
 	var files []string 
 
 	var logfile = "logs/log_" + current.Format("2006-01-02")+".txt"
+	cc.DeleteFile(&logfile) //deletes logfile
 
 	//logging
-	fp, logerr := os.OpenFile("logfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
+	fp, logerr := os.OpenFile(logfile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)//appends to logfile
 
 	if logerr != nil {
 		panic(logerr)
 	}
 
-	//deletes logfile
-	cc.DeleteFile(&logfile)
 	
 	log.SetOutput(fp)
-	fmt.Printf("\n%v", "Starts processing sql files")
-	fmt.Printf("\n\tRead dir: %v. Type: %v\n", reads_dir, which)
-	
-	log.Printf("%v", "\t------------\n\t\t\t\t\t\tStarts processing sql files")
+	log.Printf("\t------------\n\t\t\t\t\t\tStarts %v", which)
 
 	var result bool = false  
 
-	if which == "migrate" {
+	if which == "copy" {
+		fmt.Printf("\n%v", "Starts copying folders.")
+		fmt.Printf("\n\tCopies %v to %v.\n\n", copy_dir, reads_dir)
+
+		//deletes reads folder
+		result = cc.DeleteFolder(reads_dir)
+	
+		if result == false {
+			panic("Cannot delete reads folder")
+		}
+		cc.Copyfiles(copy_dir, reads_dir)
+	
+	} else if which == "migrate" {
+
+		fmt.Printf("\n%v", "Starts migrating to QA files.")
+		fmt.Printf("\n\tMigrates dir: %v.\n\n", reads_dir)
 
 		files = cc.WalkFiles(reads_dir)//returns file from directory
 		if(len(files) > 0) {
@@ -54,10 +69,18 @@ func main() {
 		}
 
 	} else {//check
+		fmt.Printf("\n%v", "Starts checking sql files.")
+		fmt.Printf("\n\tCheck hot dir: %v.\n\n", hot_dir)
 
 		files = cc.WalkFiles(hot_dir)//returns file from directory
 		if(len(files) > 0) {
-			result = cc.RegexVerifyHotfunc(&files)
+
+			result = cc.RegexVerifyLivefunc(&files)
+
+			if result != false {
+				result = cc.RegexVerifyQAfunc(&files)
+			}
+
 		} else {
 			fmt.Println("\tNo file found")
 		}

@@ -12,6 +12,7 @@ import (
 
 var re = regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live` \\/\\*!40100 DEFAULT CHARACTER SET latin1 \\*\\/;")
 var re2 = regexp.MustCompile("web_main_live")
+var re3 = regexp.MustCompile("web_main_qa")
 
 type data struct {
 	infile string	
@@ -76,7 +77,7 @@ func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr 
 	return true
 }
 
-func RegexVerifyHotfunc(file_ptr *[]string) bool {
+func RegexVerifyLivefunc(file_ptr *[]string) bool {
 	
 	max := len(*file_ptr) 
 	max -= 1 //minus the folder
@@ -101,7 +102,7 @@ func RegexVerifyHotfunc(file_ptr *[]string) bool {
 					fmt.Printf("%v failed. Found web_main_live.\n", infile)	
 					return false
 				} else {
-					fmt.Printf("%v\n", "passed")	
+					fmt.Printf("%v\n", "Not Live passed")	
 				}	
 
 				idx += 1
@@ -112,6 +113,46 @@ func RegexVerifyHotfunc(file_ptr *[]string) bool {
 
 	return true	
 }
+
+func RegexVerifyQAfunc(file_ptr *[]string) bool {
+	
+	fmt.Println("")
+	max := len(*file_ptr) 
+	max -= 1 //minus the folder
+
+	var idx = 1
+	for _, infile := range *file_ptr {
+
+		if _, err := os.Stat(infile); err == nil { //checks if file exists
+			match, _ := regexp.MatchString("\\.sql$", infile)
+			if match {
+
+				fmt.Printf("%v/%v. %v\n", idx, max, infile)
+				r, err := ioutil.ReadFile(infile)//read file
+
+				if err != nil {
+					panic(err)
+					return false
+				}
+
+				result := re3.MatchString(string(r))
+				if result == false {
+					fmt.Printf("Not found web_main_qa in %v\n", infile)	
+					return false
+				} else {
+					fmt.Printf("%v\n", "QA passed")	
+				}	
+
+				idx += 1
+			}
+		}
+
+	}//for
+
+	return true	
+}
+
+
 
 func newfileName(filename string) string {
 	//find matches, if not return original name
