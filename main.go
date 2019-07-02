@@ -13,16 +13,22 @@ import (
 )
 
 var which string = "migrate" //default
+var kind_ptr string = "other"
 
-var copy_dir string = "/home/hal/dumps/Dump20190628"
+var copy_dir string = "/home/hal/dumps/Dump20190702"
 var reads_dir string = "/home/hal/dumps/reads"
 var writes_dir string = "/home/hal/dumps/hot"
 
 var delete_infile_bool bool = true
 	
 func main() {
+	//1.
 	//which = "copy" 
-	which = "check" 
+
+	//2.
+	//which = "check" 
+	//kind = "local"
+
 	current := time.Now()
 
 	var hot_dir string = writes_dir
@@ -63,7 +69,7 @@ func main() {
 
 		files = cc.WalkFiles(reads_dir)//returns file from directory
 		if(len(files) > 0) {
-			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir)
+			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir, &kind_ptr)
 		} else {
 			fmt.Println("\tNo file found")
 		}
@@ -78,7 +84,7 @@ func main() {
 			result = cc.RegexVerifyLivefunc(&files)
 
 			if result != false {
-				result = cc.RegexVerifyQAfunc(&files)
+				result = cc.RegexVerifyQALocalfunc(&files, &kind_ptr)
 			}
 
 		} else {
@@ -93,8 +99,5 @@ func main() {
 	}
 
 }
-
-
-
 
 

@@ -10,16 +10,17 @@ import (
 	"path"
 )
 
-var re = regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live` \\/\\*!40100 DEFAULT CHARACTER SET latin1 \\*\\/;")
-var re2 = regexp.MustCompile("web_main_live")
-var re3 = regexp.MustCompile("web_main_qa")
+var re_replaced = regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live` \\/\\*!40100 DEFAULT CHARACTER SET latin1 \\*\\/;")
+var re_live = regexp.MustCompile("web_main_live")
+var re_qa = regexp.MustCompile("web_main_qa")
+var re_local = regexp.MustCompile("local_web_main")
 
 type data struct {
 	infile string	
 	outfile string
 }
 
-func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr *string) bool {
+func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr *string, kind_ptr *string) bool {
 	var max int = len(*file_ptr)
 	max -= 1 //minus the folder
 	fmt.Printf("\nfiles: %v size", max) 
@@ -42,7 +43,7 @@ func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr 
 				log.Printf("%v/%v. Processing file: %v\n",strconv.Itoa(idx + 1), max, infile)
 				fmt.Printf("\n%v/%v. Processing file: %v",strconv.Itoa(idx + 1), max, infile)
 				
-				var ok bool = regexfunc(dataobj)
+				var ok bool = regexfunc(dataobj, kind_ptr)
 
 				if ok {
 
@@ -97,12 +98,12 @@ func RegexVerifyLivefunc(file_ptr *[]string) bool {
 					return false
 				}
 
-				result := re2.MatchString(string(r))
+				result := re_live.MatchString(string(r))
 				if result == true {
 					fmt.Printf("%v failed. Found web_main_live.\n", infile)	
 					return false
 				} else {
-					fmt.Printf("%v\n", "Not Live passed")	
+					fmt.Printf("%v\n", "No Live. Passed")	
 				}	
 
 				idx += 1
@@ -114,7 +115,7 @@ func RegexVerifyLivefunc(file_ptr *[]string) bool {
 	return true	
 }
 
-func RegexVerifyQAfunc(file_ptr *[]string) bool {
+func RegexVerifyQALocalfunc(file_ptr *[]string, kind_ptr *string) bool {
 	
 	fmt.Println("")
 	max := len(*file_ptr) 
@@ -135,13 +136,26 @@ func RegexVerifyQAfunc(file_ptr *[]string) bool {
 					return false
 				}
 
-				result := re3.MatchString(string(r))
-				if result == false {
-					fmt.Printf("Not found web_main_qa in %v\n", infile)	
-					return false
+				if *kind_ptr == "local" {	
+
+					result := re_local.MatchString(string(r))
+					if result == false {
+						fmt.Printf("Not found local_web_main in %v\n", infile)	
+						return false
+					} else {
+						fmt.Printf("%v\n", "Local found. Passed")
+					}	
+
 				} else {
-					fmt.Printf("%v\n", "QA passed")	
-				}	
+
+					result := re_qa.MatchString(string(r))
+					if result == false {
+						fmt.Printf("Not found web_main_qa in %v\n", infile)	
+						return false
+					} else {
+						fmt.Printf("%v\n", "QA found. Passed")	
+					}	
+				}
 
 				idx += 1
 			}
@@ -167,7 +181,7 @@ func newfileName(filename string) string {
 	return filename
 }
 
-func regexfunc(indata data) bool {
+func regexfunc(indata data, kind_ptr *string) bool {
 	//fmt.Printf("\n\tregexfunc:\n\tinfile: %v,\n\toutfile: %v\n",infile, outfile)
 
 	if _, err := os.Stat(indata.infile); err == nil {
@@ -192,10 +206,14 @@ func regexfunc(indata data) bool {
 
 		//1o2
 		//re := regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_live` \\/\\*!40100 DEFAULT CHARACTER SET latin1 \\*\\/;")
-		content := re.ReplaceAllString(string(r), "") 
+		content := re_replaced.ReplaceAllString(string(r), "") 
 		//2o2
-		//re2 := regexp.MustCompile("web_main_live")
-		content = re2.ReplaceAllString(content, "web_main_qa") 
+		//re_live := regexp.MustCompile("web_main_live")
+		if *kind_ptr == "local" { 
+			content = re_live.ReplaceAllString(content, "local_web_main") 
+		} else {
+			content = re_live.ReplaceAllString(content, "web_main_qa") 
+		}
 
 		err = ioutil.WriteFile(indata.outfile, []byte(content), 0777)//writes content
 
