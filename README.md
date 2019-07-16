@@ -1,5 +1,5 @@
 DbMigration, Golang, working ubuntu
-7/02 Tues
+7/16 Tues
 
 Modify migration code
 
@@ -7,7 +7,7 @@ Modify migration code
 cd /home/hal/Documents/softwares/eclipse_golang/workspace/src/DbMigration
 
 #hot path
-cd /home/hal/dumps/hot; grep -rni 'web_main_live' 
+cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
 
 #datatypes
 bool

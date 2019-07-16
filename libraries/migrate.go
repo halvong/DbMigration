@@ -136,7 +136,7 @@ func RegexVerifyQALocalfunc(file_ptr *[]string, kind_ptr *string) bool {
 					return false
 				}
 
-				if *kind_ptr == "local" {	
+				if *kind_ptr == "local" {
 
 					result := re_local.MatchString(string(r))
 					if result == false {

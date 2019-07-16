@@ -12,22 +12,27 @@ import (
 	cc "DbMigration/libraries"
 )
 
-var which string = "migrate" //default
-var kind_ptr string = "other"
+var which string = "copy"
+var kind string = "qa"
 
-var copy_dir string = "/home/hal/dumps/Dump20190702"
+var copy_dir string
 var reads_dir string = "/home/hal/dumps/reads"
 var writes_dir string = "/home/hal/dumps/hot"
 
 var delete_infile_bool bool = true
 	
 func main() {
-	//1.
+	//0. change copy_dir to folder
 	//which = "copy" 
+	//copy_dir = "/home/hal/dumps/Dump20190716"
+	//kind = "qa" //qa or local
+
+	//1. migrate
+	//which = "migrate"
 
 	//2.
-	//which = "check" 
-	//kind = "local"
+	which = "check" 
+	//kind = "local"//web_main_qa = qa; web_main_local = local
 
 	current := time.Now()
 
@@ -69,7 +74,7 @@ func main() {
 
 		files = cc.WalkFiles(reads_dir)//returns file from directory
 		if(len(files) > 0) {
-			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir, &kind_ptr)
+			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir, &kind)
 		} else {
 			fmt.Println("\tNo file found")
 		}
@@ -84,7 +89,7 @@ func main() {
 			result = cc.RegexVerifyLivefunc(&files)
 
 			if result != false {
-				result = cc.RegexVerifyQALocalfunc(&files, &kind_ptr)
+				result = cc.RegexVerifyQALocalfunc(&files, &kind)
 			}
 
 		} else {
