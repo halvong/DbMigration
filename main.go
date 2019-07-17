@@ -12,7 +12,7 @@ import (
 	cc "DbMigration/libraries"
 )
 
-var which string = "copy"
+var which string
 var kind string = "qa"
 
 var copy_dir string
@@ -22,17 +22,20 @@ var writes_dir string = "/home/hal/dumps/hot"
 var delete_infile_bool bool = true
 	
 func main() {
-	//0. change copy_dir to folder
+	//0. copy from Dump folder to read folder  
 	//which = "copy" 
-	//copy_dir = "/home/hal/dumps/Dump20190716"
-	//kind = "qa" //qa or local
+	//copy_dir = "/home/hal/dumps/Dump20190717"
+	//kind = "local" //qa or local
 
-	//1. migrate
+	//1. migrate, process from read to hot folder
 	//which = "migrate"
 
 	//2.
-	which = "check" 
+	//which = "check" 
 	//kind = "local"//web_main_qa = qa; web_main_local = local
+
+	//3.
+	//which = "clean" //deletes all files in hot
 
 	current := time.Now()
 
@@ -79,7 +82,7 @@ func main() {
 			fmt.Println("\tNo file found")
 		}
 
-	} else {//check
+	} else if which == "check" {
 		fmt.Printf("\n%v", "Starts checking sql files.")
 		fmt.Printf("\n\tCheck hot dir: %v.\n\n", hot_dir)
 
@@ -95,6 +98,18 @@ func main() {
 		} else {
 			fmt.Println("\tNo file found")
 		}
+
+	} else if which == "clean" {
+
+		fmt.Println("Deletes all the files in hot.")	
+		result = cc.DeleteFolder(hot_dir)
+	
+		if result == false {
+			panic("Cannot delete reads folder")
+		}
+	
+	} else {//check
+		fmt.Println("Nothing is chosen")	
 	}
 
 	if result == false {

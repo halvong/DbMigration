@@ -1,5 +1,5 @@
 DbMigration, Golang, working ubuntu
-7/16 Tues
+7/17 Wed
 
 Modify migration code
 
