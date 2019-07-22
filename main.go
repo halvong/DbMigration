@@ -24,17 +24,17 @@ var delete_infile_bool bool = true
 func main() {
 	//0. copy from Dump folder to read folder  
 	//which = "copy" 
-	//copy_dir = "/home/hal/dumps/Dump20190717"
-	//kind = "local" //qa or local
+	//copy_dir = "/home/hal/dumps/Dump20190722"
 
 	//1. migrate, process from read to hot folder
 	//which = "migrate"
+	//kind = "local" //qa or local
 
 	//2.
-	//which = "check" 
-	//kind = "local"//web_main_qa = qa; web_main_local = local
+	which = "check" 
+	kind = "local"//web_main_qa = qa; web_main_local = local
 
-	//3.
+	//3. after upload is done
 	//which = "clean" //deletes all files in hot
 
 	current := time.Now()
@@ -83,15 +83,20 @@ func main() {
 		}
 
 	} else if which == "check" {
-		fmt.Printf("\n%v", "Starts checking sql files.")
-		fmt.Printf("\n\tCheck hot dir: %v.\n\n", hot_dir)
 
 		files = cc.WalkFiles(hot_dir)//returns file from directory
+		var max int = len(files)
+
+		fmt.Printf("Starts checking %d files for '%s'", max, kind)
+		fmt.Printf("\n\tCheck hot dir: %v\n", hot_dir)
+
 		if(len(files) > 0) {
 
+			fmt.Printf("\tVerify 'no' Live")
 			result = cc.RegexVerifyLivefunc(&files)
 
 			if result != false {
+				fmt.Printf("\n\tVerify '%s'", kind)
 				result = cc.RegexVerifyQALocalfunc(&files, &kind)
 			}
 

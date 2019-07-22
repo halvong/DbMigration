@@ -90,7 +90,6 @@ func RegexVerifyLivefunc(file_ptr *[]string) bool {
 			match, _ := regexp.MatchString("\\.sql$", infile)
 			if match {
 
-				fmt.Printf("%v/%v. %v\n", idx, max, infile)
 				r, err := ioutil.ReadFile(infile)//read file
 
 				if err != nil {
@@ -102,9 +101,7 @@ func RegexVerifyLivefunc(file_ptr *[]string) bool {
 				if result == true {
 					fmt.Printf("%v failed. Found web_main_live.\n", infile)	
 					return false
-				} else {
-					fmt.Printf("%v\n", "No Live. Passed")	
-				}	
+				} 
 
 				idx += 1
 			}
@@ -128,7 +125,6 @@ func RegexVerifyQALocalfunc(file_ptr *[]string, kind_ptr *string) bool {
 			match, _ := regexp.MatchString("\\.sql$", infile)
 			if match {
 
-				fmt.Printf("%v/%v. %v\n", idx, max, infile)
 				r, err := ioutil.ReadFile(infile)//read file
 
 				if err != nil {
@@ -142,19 +138,16 @@ func RegexVerifyQALocalfunc(file_ptr *[]string, kind_ptr *string) bool {
 					if result == false {
 						fmt.Printf("Not found local_web_main in %v\n", infile)	
 						return false
-					} else {
-						fmt.Printf("%v\n", "Local found. Passed")
-					}	
+					} 
 
-				} else {
+				} else {//QA
 
 					result := re_qa.MatchString(string(r))
 					if result == false {
 						fmt.Printf("Not found web_main_qa in %v\n", infile)	
 						return false
-					} else {
-						fmt.Printf("%v\n", "QA found. Passed")	
-					}	
+					} 
+
 				}
 
 				idx += 1
