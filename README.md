@@ -1,10 +1,10 @@
 DbMigration, Golang, working ubuntu
-7/22, Mon
+11/06, Wed
 
 Modify migration code
 
 #path
-cd /home/hal/Documents/softwares/eclipse_golang/workspace/src/DbMigration
+cd /home/hal/Documents/softwares/go_eclipse/go_workspace/src/DbMigration
 
 #checks "no" live
 cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 

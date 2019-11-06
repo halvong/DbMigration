@@ -22,19 +22,24 @@ var writes_dir string = "/home/hal/dumps/hot"
 var delete_infile_bool bool = true
 	
 func main() {
+
+	fmt.Println("Starting")
 	//0. copy from Dump folder to read folder  
 	//which = "copy" 
-	//copy_dir = "/home/hal/dumps/Dump20190722"
+	//copy_dir = "/home/hal/dumps/Dump20191106"
 
 	//1. migrate, process from read to hot folder
 	//which = "migrate"
-	//kind = "local" //qa or local
+	//kind = "qa" //qa or local
 
 	//2.
-	which = "check" 
-	kind = "local"//web_main_qa = qa; web_main_local = local
+	//which = "check" 
+	//kind = "qa"//web_main_qa = qa; web_main_local = local
 
-	//3. after upload is done
+	//3.
+	//cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
+	
+	//4. after upload is done
 	//which = "clean" //deletes all files in hot
 
 	current := time.Now()
@@ -59,6 +64,9 @@ func main() {
 	var result bool = false  
 
 	if which == "copy" {
+		fmt.Println("Deletes all the files in hot.")	
+		result = cc.DeleteFolder(hot_dir)
+
 		fmt.Printf("\n%v", "Starts copying folders.")
 		fmt.Printf("\n\tCopies %v to %v.\n\n", copy_dir, reads_dir)
 
