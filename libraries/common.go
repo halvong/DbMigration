@@ -119,3 +119,27 @@ func DeleteFile(infile_ptr *string) bool {
 
 	return false
 }
+
+func CheckF(arr []string) bool {
+
+	var ok bool = true  
+
+	for _, infile := range(arr) {	
+
+		fmt.Printf("Checking exists %v\n", infile)
+
+		 _, err := os.Stat(infile)
+
+		if err != nil { 
+			ok = false
+			break		
+		}
+
+		if os.IsNotExist(err) { 
+			ok = false
+			break		
+		}
+	}
+
+	return ok
+}
