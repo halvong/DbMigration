@@ -25,8 +25,8 @@ func main() {
 
 	fmt.Println("Starting")
 	//0. copy from Dump folder to read folder  
-	//which = "copy" 
-	//copy_dir = "/home/hal/dumps/Dump20191106"
+	which = "copy" 
+	copy_dir = "/home/hal/dumps/Dump20191106"
 
 	//1. migrate, process from read to hot folder
 	//which = "migrate"
@@ -47,6 +47,13 @@ func main() {
 	var hot_dir string = writes_dir
 	var files []string 
 
+	ok := cc.CheckF([]string{"logs",reads_dir,copy_dir,hot_dir})
+
+	if ok == false {
+		panic(copy_dir+" does not exists\n")
+	}
+
+
 	var logfile = "logs/log_" + current.Format("2006-01-02")+".txt"
 	cc.DeleteFile(&logfile) //deletes logfile
 
@@ -57,13 +64,15 @@ func main() {
 		panic(logerr)
 	}
 
-	
 	log.SetOutput(fp)
 	log.Printf("\t------------\n\t\t\t\t\t\tStarts %v", which)
 
 	var result bool = false  
 
 	if which == "copy" {
+
+
+
 		fmt.Println("Deletes all the files in hot.")	
 		result = cc.DeleteFolder(hot_dir)
 
