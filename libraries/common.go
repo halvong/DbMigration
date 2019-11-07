@@ -126,8 +126,6 @@ func CheckF(arr []string) bool {
 
 	for _, infile := range(arr) {	
 
-		fmt.Printf("Checking exists %v\n", infile)
-
 		 _, err := os.Stat(infile)
 
 		if err != nil { 

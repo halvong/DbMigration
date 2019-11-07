@@ -1,7 +1,7 @@
 DbMigration, Golang, working ubuntu
 11/07, Thurs
 
-Modify migration code
+add verify baseline files & folders
 
 #path
 cd /home/hal/Documents/softwares/go_eclipse/go_workspace/src/DbMigration
