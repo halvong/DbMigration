@@ -43,8 +43,8 @@ func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr 
 				dataobj.infile = infile
 				dataobj.outfile = *writes_dir_ptr + "/" + newfileName(filename)
 
-				log.Printf("%v/%v. Processing file: %v\n",strconv.Itoa(idx + 1), max, infile)
-				fmt.Printf("\n%v/%v. Processing file: %v",strconv.Itoa(idx + 1), max, infile)
+				log.Printf("%v/%v. Processing file: %v\n",strconv.Itoa(idx), max, infile)
+				fmt.Printf("\n%v/%v. Processing file: %v",strconv.Itoa(idx), max, infile)
 				
 				var ok bool = regexfunc(dataobj, kind_ptr, version_ptr)//2
 

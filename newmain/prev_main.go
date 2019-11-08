@@ -12,7 +12,6 @@ import (
 	cc "DbMigration/libraries"
 )
 
-var version = "v1"
 var which string
 var kind string = "qa"
 
@@ -20,19 +19,18 @@ var copy_dir string
 var reads_dir string = "/home/hal/dumps/reads"
 var writes_dir string = "/home/hal/dumps/hot"
 
-var delete_infile_bool bool = false
+var delete_infile_bool bool = true
 	
 func main() {
 
 	fmt.Println("Starting")
 	//0. copy from Dump folder to read folder  
-	//which = "copy" 
-	//copy_dir = "/home/hal/dumps/Dump2"
+	which = "copy" 
+	copy_dir = "/home/hal/dumps/Dump20191106"
 
 	//1. migrate, process from read to hot folder
-	which = "migrate"
-	kind = "qa" //qa or local
-	version = "v2"
+	//which = "migrate"
+	//kind = "qa" //qa or local
 
 	//2.
 	//which = "check" 
@@ -49,11 +47,12 @@ func main() {
 	var hot_dir string = writes_dir
 	var files []string 
 
-	//ok, findfile := cc.CheckF([]string{"logs",reads_dir,copy_dir,hot_dir})
-	//Server version ok, findfile := cc.CheckF([]string{"logs",copy_dir,hot_dir})
-	//if ok == false {
-	//	panic(findfile+" does not exists\n")
-	//}
+	ok := cc.CheckF([]string{"logs",reads_dir,copy_dir,hot_dir})
+
+	if ok == false {
+		panic(copy_dir+" does not exists\n")
+	}
+
 
 	var logfile = "logs/log_" + current.Format("2006-01-02")+".txt"
 	cc.DeleteFile(&logfile) //deletes logfile
@@ -71,6 +70,8 @@ func main() {
 	var result bool = false  
 
 	if which == "copy" {
+
+
 
 		fmt.Println("Deletes all the files in hot.")	
 		result = cc.DeleteFolder(hot_dir)
@@ -93,7 +94,7 @@ func main() {
 
 		files = cc.WalkFiles(reads_dir)//returns file from directory
 		if(len(files) > 0) {
-			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir, &kind, &version)
+			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir, &kind)
 		} else {
 			fmt.Println("\tNo file found")
 		}
