@@ -44,16 +44,22 @@ func main() {
 	//4. after upload is done
 	//which = "clean" //deletes all files in hot
 
-	current := time.Now()
-
 	var hot_dir string = writes_dir
 	var files []string 
+	current := time.Now()
 
-	//ok, findfile := cc.CheckF([]string{"logs",reads_dir,copy_dir,hot_dir})
-	//Server version ok, findfile := cc.CheckF([]string{"logs",copy_dir,hot_dir})
-	//if ok == false {
-	//	panic(findfile+" does not exists\n")
-	//}
+	//checks for default folders/files
+	var ok bool = false 
+	if which == "copy" {
+		ok = cc.CheckF([]string{"logs",reads_dir,copy_dir,hot_dir})
+	} else if which == "migrate" {
+		ok = cc.CheckF([]string{"logs",reads_dir,hot_dir})
+	} else {
+		ok = cc.CheckF([]string{"logs",hot_dir})
+	}
+	if ok == false {
+		panic("Default file/folder does not exists\n")
+	}
 
 	var logfile = "logs/log_" + current.Format("2006-01-02")+".txt"
 	cc.DeleteFile(&logfile) //deletes logfile
@@ -112,7 +118,7 @@ func main() {
 			result = cc.RegexVerifyLivefunc(&files)
 
 			if result != false {
-				fmt.Printf("\n\tVerify '%s'", kind)
+				fmt.Printf("\n\tVerify all '%s'", kind)
 				result = cc.RegexVerifyQALocalfunc(&files, &kind)
 			}
 
