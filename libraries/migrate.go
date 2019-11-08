@@ -14,13 +14,16 @@ var re_replaced = regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_l
 var re_live = regexp.MustCompile("web_main_live")
 var re_qa = regexp.MustCompile("web_main_qa")
 var re_local = regexp.MustCompile("local_web_main")
+//var re_version = regexp.MustCompile("-- Server version	5.5.53-log")
+var re_version = regexp.MustCompile(`-- Server version\s+.+`)
 
 type data struct {
 	infile string	
 	outfile string
 }
 
-func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr *string, kind_ptr *string) bool {
+func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr *string, kind_ptr *string, version_ptr *string) bool {
+	//1
 	var max int = len(*file_ptr)
 	max -= 1 //minus the folder
 	fmt.Printf("\nfiles: %v size", max) 
@@ -43,7 +46,7 @@ func RegexReadsfunc(file_ptr *[]string, delete_infile_ptr *bool, writes_dir_ptr 
 				log.Printf("%v/%v. Processing file: %v\n",strconv.Itoa(idx + 1), max, infile)
 				fmt.Printf("\n%v/%v. Processing file: %v",strconv.Itoa(idx + 1), max, infile)
 				
-				var ok bool = regexfunc(dataobj, kind_ptr)
+				var ok bool = regexfunc(dataobj, kind_ptr, version_ptr)//2
 
 				if ok {
 
@@ -159,8 +162,6 @@ func RegexVerifyQALocalfunc(file_ptr *[]string, kind_ptr *string) bool {
 	return true	
 }
 
-
-
 func newfileName(filename string) string {
 	//find matches, if not return original name
 	
@@ -174,7 +175,8 @@ func newfileName(filename string) string {
 	return filename
 }
 
-func regexfunc(indata data, kind_ptr *string) bool {
+func regexfunc(indata data, kind_ptr *string, version_ptr *string) bool {
+	//2
 	//fmt.Printf("\n\tregexfunc:\n\tinfile: %v,\n\toutfile: %v\n",infile, outfile)
 
 	if _, err := os.Stat(indata.infile); err == nil {
@@ -205,7 +207,10 @@ func regexfunc(indata data, kind_ptr *string) bool {
 		if *kind_ptr == "local" { 
 			content = re_live.ReplaceAllString(content, "local_web_main") 
 		} else {
+
 			content = re_live.ReplaceAllString(content, "web_main_qa") 
+
+			if *version_ptr == "v2" { content = re_version.ReplaceAllString(content, "USE web_main_qa;") }
 		}
 
 		err = ioutil.WriteFile(indata.outfile, []byte(content), 0777)//writes content

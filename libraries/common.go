@@ -120,24 +120,31 @@ func DeleteFile(infile_ptr *string) bool {
 	return false
 }
 
-func CheckF(arr []string) bool {
+func CheckF(arr []string)(bool,string) {
 
 	var ok bool = true  
+	var tmpfile string
 
 	for _, infile := range(arr) {	
 
+		fmt.Println(infile)
 		 _, err := os.Stat(infile)
 
 		if err != nil { 
+			fmt.Println("1.",err)
+
 			ok = false
+			tmpfile = infile
 			break		
 		}
 
 		if os.IsNotExist(err) { 
+			fmt.Println("2.")
+			tmpfile = infile
 			ok = false
 			break		
 		}
 	}
 
-	return ok
+	return ok, tmpfile
 }
