@@ -14,7 +14,6 @@ var re_replaced = regexp.MustCompile("CREATE DATABASE  IF NOT EXISTS `web_main_l
 var re_live = regexp.MustCompile("web_main_live")
 var re_qa = regexp.MustCompile("web_main_qa")
 var re_local = regexp.MustCompile("local_web_main")
-//var re_version = regexp.MustCompile("-- Server version	5.5.53-log")
 var re_version = regexp.MustCompile(`-- Server version\s+.+`)
 
 type data struct {

@@ -52,9 +52,7 @@ func main() {
 	//delete_dir += "archives/Dump20191107"
 
 	//6.
-	which = "copy_targz"
-
-	fmt.Printf("%v", delete_dir)
+	//which = "copy_targz"
 
 	var hot_dir string = writes_dir
 	var files []string 
