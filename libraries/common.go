@@ -11,6 +11,7 @@ import (
 )
 
 func File(src, dst string) error {
+
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -165,33 +166,6 @@ func DeleteFile(infile_ptr *string) bool {
 		}
 	}
 
-<<<<<<< HEAD
-	return false
-}
-
-func CheckF(arr []string) bool {
-
-	var ok bool = true  
-
-	for _, infile := range(arr) {	
-
-		fmt.Printf("Checking exists %v\n", infile)
-
-		 _, err := os.Stat(infile)
-
-		if err != nil { 
-			ok = false
-			break		
-		}
-
-		if os.IsNotExist(err) { 
-			ok = false
-			break		
-		}
-	}
-
-	return ok
-=======
 	return true
 }
 
@@ -244,5 +218,4 @@ func RemoveDirectory(folder_ptr *string) bool {
 	}
 
 	return true
->>>>>>> refs/heads/dev
 }

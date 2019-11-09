@@ -1,9 +1,5 @@
 DbMigration, Golang, working ubuntu
-<<<<<<< HEAD
-11/07, Thurs
-=======
 11/08, Fri
->>>>>>> refs/heads/dev
 
 add moves tar.gz files to destination folder 
 
