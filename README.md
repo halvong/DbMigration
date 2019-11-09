@@ -1,7 +1,7 @@
 DbMigration, Golang, working ubuntu
-11/07, Thurs
+11/08, Fri
 
-add verify baseline files & folders
+add moves tar.gz files to destination folder 
 
 #path
 cd /home/hal/Documents/softwares/go_eclipse/go_workspace/src/DbMigration

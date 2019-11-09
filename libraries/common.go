@@ -65,6 +65,55 @@ func Copyfiles(src string, dest string) error {
 	return nil
 }
 
+func CopyTargzfiles(src_ptr *string, dest_ptr *string) bool {
+	
+	var ok bool = true
+	var err error
+	var fds []os.FileInfo
+	var src_arr []string 
+	var dest_arr []string 
+	var max int 
+
+	if fds, err = ioutil.ReadDir(*src_ptr); err != nil {
+		panic(err)
+		return false
+	}
+	
+	
+	for _, fd := range fds {
+		var srcfp string = path.Join(*src_ptr, fd.Name())
+		var dstfp string = path.Join(*dest_ptr, fd.Name())
+
+		match, _ := regexp.MatchString(`\.tar\.gz$`, srcfp)
+
+		if match {
+			src_arr = append(src_arr, srcfp)		
+			dest_arr = append(dest_arr, dstfp)		
+		}
+	}//for
+
+	max = len(src_arr)	
+	for idx, ffile := range(src_arr) {
+
+		fmt.Printf("%v/%v. Copying %v => %v\n",idx+1, max, ffile, dest_arr[idx])
+
+		DeleteFile(&dest_arr[idx])
+		if err = File(ffile, dest_arr[idx]); err != nil {
+			ok = false
+			panic(err)	
+		}	
+	}
+
+	if ok {
+		//deletes file	
+		for _, ffile := range(src_arr) {
+			DeleteFile(&ffile)
+		}
+	}
+
+	return ok
+}
+
 func WalkFiles(dir_reads string) []string {
 
 	var files []string
@@ -87,19 +136,19 @@ func WalkFiles(dir_reads string) []string {
 	return files	
 }
 
-func DeleteFolder(dir_read string) bool {
+func DeleteFolder(dir_read_ptr *string) bool {
 	var ok bool = true
-	var files []string = WalkFiles(dir_read)
+	var files []string = WalkFiles(*dir_read_ptr)
 
 	for _, file := range files {
-		ok := DeleteFile(&file)
 
-		if ok == false {
-			break	
+		if len(file) > 0 {
+			ok := DeleteFile(&file)
+			if ok == false { break }
 		}
 	}
 
-	return ok
+	return ok	
 }
 
 func DeleteFile(infile_ptr *string) bool {
@@ -114,19 +163,18 @@ func DeleteFile(infile_ptr *string) bool {
 			fmt.Printf("\tFile %v failed to delete.", *infile_ptr)
 			return false
 		}
-		return true
 	}
 
-	return false
+	return true
 }
 
 func CheckF(arr []string)bool {
 
 	var ok bool = true  
 
-	for idx, infile := range(arr) {	
+	for _, infile := range(arr) {	
 
-		fmt.Println(idx,infile)
+		//fmt.Println(idx,infile)
 		 _, err := os.Stat(infile)
 
 		if err != nil { 
@@ -143,4 +191,30 @@ func CheckF(arr []string)bool {
 	}
 
 	return ok
+}
+
+func RemoveDirectory(folder_ptr *string) bool {
+
+    _, err := os.Stat(*folder_ptr)
+
+	if err == nil {
+
+		var ok bool = DeleteFolder(folder_ptr)
+
+		if ok {
+
+			err := os.Remove(*folder_ptr)
+
+			if err != nil {
+				fmt.Printf("\tFolder %v failed to delete.", *folder_ptr)
+				fmt.Printf("\tError: %v.", err)
+				return false
+			}
+
+		} else {
+			return false
+		}
+	}
+
+	return true
 }
