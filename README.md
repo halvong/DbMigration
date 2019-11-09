@@ -1,7 +1,11 @@
 DbMigration, Golang, working ubuntu
+<<<<<<< HEAD
 11/07, Thurs
+=======
+11/08, Fri
+>>>>>>> refs/heads/dev
 
-Modify migration code
+add moves tar.gz files to destination folder 
 
 #path
 cd /home/hal/Documents/softwares/go_eclipse/go_workspace/src/DbMigration
