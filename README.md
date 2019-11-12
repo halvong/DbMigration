@@ -1,10 +1,10 @@
 DbMigration, Golang, working ubuntu
-11/08, Fri
+11/12, Tues
 
-add moves tar.gz files to destination folder 
+improves the clean method
 
 #path
-cd /home/hal/Documents/softwares/go_eclipse/go_workspace/src/DbMigration
+cd /home/hal/Documents/softwares/go-eclipse/workspace/src/DbMigration
 
 #checks "no" live
 cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 

@@ -12,7 +12,7 @@ import (
 	cc "DbMigration/libraries"
 )
 
-var version = "v1"
+var version = "v2"
 var which string
 var kind string = "qa"
 
@@ -22,36 +22,35 @@ var writes_dir string = "/home/hal/dumps/hot"
 var delete_dir string = "/home/hal/dumps/"
 var copy_targz_dir string = "/home/hal/dumps/archives"
 var destination_dir string = "/home/hal/Downloads/centos7work"
-
 var delete_infile_bool bool = false
-	
+
 func main() {
 
-	fmt.Println("Starting")
-	//0. copy from Dump folder to read folder  
+	fmt.Println("Starting script")
+	//0. Copy from Dump folder to read folder  
 	//which = "copy" 
-	//copy_dir = "/home/hal/dumps/Dump20191107"
+	//copy_dir = "/home/hal/dumps/Dump20191108"
 
-	//1. migrate, process from read to hot folder
+	//1. Migrate, process from read to hot folder
 	//which = "migrate"
 	//kind = "qa" //qa or local
 	//version = "v2"
 
-	//2.
+	//2. Check
 	//which = "check" 
 	//kind = "qa"//web_main_qa = qa; web_main_local = local
 
-	//3.
+	//3. Grep
 	//cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
 	
-	//4. after upload is done
-	//which = "clean" //deletes all files in hot
+	//4. Clean,  after upload is done
+	which = "clean" //deletes all files in hot
 
-	//5.
+	//5. Delete
 	//which = "delete"
 	//delete_dir += "archives/Dump20191107"
 
-	//6.
+	//6. Copy Tar Gz
 	//which = "copy_targz"
 
 	var hot_dir string = writes_dir
@@ -62,10 +61,8 @@ func main() {
 	var ok bool = false 
 	if which == "copy" {
 		ok = cc.CheckF([]string{"logs",copy_dir,reads_dir})
-	} else if which == "migrate" {
+	} else if which == "migrate" || which == "clean" {
 		ok = cc.CheckF([]string{"logs",reads_dir,hot_dir})
-	} else if which == "clean" {
-		ok = cc.CheckF([]string{"logs",hot_dir})
 	} else if which == "delete" {
 		ok = cc.CheckF([]string{"logs",delete_dir})
 	} else if which == "copy_targz" {
@@ -145,8 +142,12 @@ func main() {
 	} else if which == "clean" || which == "delete" {
 
 		if which == "clean" {
-			fmt.Println("\nDeletes all the files in hot.")	
-			result = cc.DeleteFolder(&hot_dir)
+
+			for _, folder := range([2]string{"hot_dir","reads_dir"}) {
+				fmt.Printf("\nDeletes all the files in %v", folder)	
+				result = cc.DeleteFolder(&folder)
+			}
+
 		} else if which == "delete" {
 			fmt.Println("\nDeletes "+delete_dir)	
 			result = cc.RemoveDirectory(&delete_dir)
@@ -168,9 +169,9 @@ func main() {
 	}
 
 	if result == false {
-		fmt.Println("***Failed***")
+		fmt.Println("\n\n***Failed***")
 	} else {
-		fmt.Println("***Success!***")
+		fmt.Println("\n\n***Success!***")
 	}
 
 }
