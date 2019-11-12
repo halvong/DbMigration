@@ -18,13 +18,16 @@ var kind string = "qa"
 
 var copy_dir string
 var reads_dir string = "/home/hal/dumps/reads"
-var writes_dir string = "/home/hal/dumps/hot"
+var hot_dir string = "/home/hal/dumps/hot"
 var delete_dir string = "/home/hal/dumps/"
 var copy_targz_dir string = "/home/hal/dumps/archives"
 var destination_dir string = "/home/hal/Downloads/centos7work"
 var delete_infile_bool bool = false
 
 func main() {
+	current := time.Now()
+	var files []string 
+	var ok bool = false 
 
 	fmt.Println("Starting script")
 	//0. Copy from Dump folder to read folder  
@@ -34,7 +37,6 @@ func main() {
 	//1. Migrate, process from read to hot folder
 	//which = "migrate"
 	//kind = "qa" //qa or local
-	//version = "v2"
 
 	//2. Check
 	//which = "check" 
@@ -53,12 +55,7 @@ func main() {
 	//6. Copy Tar Gz
 	//which = "copy_targz"
 
-	var hot_dir string = writes_dir
-	var files []string 
-	current := time.Now()
-
 	//checks for default folders/files
-	var ok bool = false 
 	if which == "copy" {
 		ok = cc.CheckF([]string{"logs",copy_dir,reads_dir})
 	} else if which == "migrate" || which == "clean" {
