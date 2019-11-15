@@ -46,14 +46,14 @@ func main() {
 	//cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
 	
 	//4. Clean,  after upload is done
-	which = "clean" //deletes all files in hot
+	//which = "clean" //deletes all files in hot
 
 	//5. Delete
 	//which = "delete"
 	//delete_dir += "archives/Dump20191107"
 
 	//6. Copy Tar Gz
-	//which = "copy_targz"
+	which = "copy_targz"
 
 	//checks for default folders/files
 	if which == "copy" {
@@ -109,7 +109,7 @@ func main() {
 
 		files = cc.WalkFiles(reads_dir)//returns file from directory
 		if(len(files) > 0) {
-			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &writes_dir, &kind, &version)
+			result = cc.RegexReadsfunc(&files, &delete_infile_bool, &hot_dir, &kind, &version)
 		} else {
 			fmt.Println("\tNo file found")
 		}

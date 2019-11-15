@@ -1,7 +1,8 @@
 DbMigration, Golang, working ubuntu
-11/12, Tues
+11/14, Thurs
 
-improves the clean method
+learning gzip & tar
+misc.go
 
 #path
 cd /home/hal/Documents/softwares/go-eclipse/workspace/src/DbMigration
@@ -9,7 +10,7 @@ cd /home/hal/Documents/softwares/go-eclipse/workspace/src/DbMigration
 #checks "no" live
 cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
 
-	
+
 #datatypes
 bool
 string
@@ -25,3 +26,6 @@ rune // alias for int32
 float32 float64
 
 complex64 complex128
+
+#notes
+fmt.Println("\ntype: ", reflect.TypeOf(fp))	
