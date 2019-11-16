@@ -9,11 +9,15 @@ import (
 	"log"
 	"os"
 	"time"
+	"path"
+	"compress/gzip"
+	"regexp"
+	"io/ioutil"
+	"archive/tar"
 	cc "DbMigration/libraries"
 )
 
 var version = "v2"
-var which string
 var kind string = "qa"
 
 var copy_dir string
@@ -21,6 +25,8 @@ var reads_dir string = "/home/hal/dumps/reads"
 var hot_dir string = "/home/hal/dumps/hot"
 var delete_dir string = "/home/hal/dumps/"
 var copy_targz_dir string = "/home/hal/dumps/archives"
+var targz_dir string = "/home/hal/dumps/" 
+var dest_targz_dir = "/home/hal/dumps/archives/"
 var destination_dir string = "/home/hal/Downloads/centos7work"
 var delete_infile_bool bool = false
 
@@ -31,29 +37,34 @@ func main() {
 
 	fmt.Println("Starting script")
 	//0. Copy from Dump folder to read folder  
-	//which = "copy" 
+	//var which = "copy" 
 	//copy_dir = "/home/hal/dumps/Dump20191108"
 
 	//1. Migrate, process from read to hot folder
-	//which = "migrate"
+	//var which = "migrate"
 	//kind = "qa" //qa or local
 
 	//2. Check
-	//which = "check" 
+	//var which = "check" 
 	//kind = "qa"//web_main_qa = qa; web_main_local = local
 
 	//3. Grep
 	//cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
 	
 	//4. Clean,  after upload is done
-	//which = "clean" //deletes all files in hot
+	//var which = "clean" //deletes all files in hot
 
 	//5. Delete
-	//which = "delete"
+	//var which = "delete"
 	//delete_dir += "archives/Dump20191107"
 
 	//6. Copy Tar Gz
-	which = "copy_targz"
+	//var which = "copy_targz"
+
+	//7. Tar Gz
+	//var which = "targz"
+	//targz_dir += "Dump20191115" 
+	//dest_targz_dir += "Dump20191115.tar.gz" 
 
 	//checks for default folders/files
 	if which == "copy" {
@@ -64,6 +75,8 @@ func main() {
 		ok = cc.CheckF([]string{"logs",delete_dir})
 	} else if which == "copy_targz" {
 		ok = cc.CheckF([]string{"logs",copy_targz_dir,destination_dir})
+	} else if which == "targz" {
+		ok = cc.CheckF([]string{"logs",targz_dir,dest_targz_dir})
 	} else {
 		ok = cc.CheckF([]string{"logs"})
 	}
@@ -160,6 +173,41 @@ func main() {
 		fmt.Printf("\n\tCopies %v to %v.\n\n", copy_targz_dir, destination_dir)
 
 		result = cc.CopyTargzfiles(&copy_targz_dir, &destination_dir)
+
+	} else if which == "targz" {
+
+		file, err := os.Create(dest_targz_dir)
+		if err != nil { panic(err) }
+		defer file.Close()
+		// set up the gzip writer	
+		gw := gzip.NewWriter(file)
+		defer gw.Close()
+		tw := tar.NewWriter(gw)
+		defer tw.Close()
+
+		if fds, err = ioutil.ReadDir(targz_dir); err != nil {
+			panic(err)
+		}
+		var max int = len(fds) - 1
+
+		var fds []os.FileInfo
+		for idx, fd := range fds {
+
+			var srcfp string = path.Join(targz_dir, fd.Name())
+
+			match, _ := regexp.MatchString(`\.sql$`, srcfp)
+
+			if match {
+				fmt.Printf("%v/%v. targz %v\n",idx, max, srcfp)
+
+				if err := cc.AddFile(tw, srcfp); err != nil {
+					panic(err)
+				}
+			}
+
+		}//for
+		
+		result = true
 
 	} else {//check
 		fmt.Println("Nothing is chosen")	

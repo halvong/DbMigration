@@ -1,8 +1,7 @@
 DbMigration, Golang, working ubuntu
-11/14, Thurs
+11/15, Fri
 
-learning gzip & tar
-misc.go
+includes gzip & tar
 
 #path
 cd /home/hal/Documents/softwares/go-eclipse/workspace/src/DbMigration

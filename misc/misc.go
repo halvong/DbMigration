@@ -1,69 +1,87 @@
 package main
 
 import (
+	"os"
 	"archive/tar"
 	"fmt"
+	"regexp"
+	"path"	
+	"io/ioutil"
 	"io"
-	"os"
-	"path/filepath"
-	"strings"
+	"compress/gzip"
 )
 
-func main() {
-	fmt.Println("Hello World!")
+func addFile(tw * tar.Writer, path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	if stat, err := file.Stat(); err == nil {
+		// now lets create the header as needed for this file within the tarball	
+		header := new(tar.Header)
+		header.Name = path
+		header.Size = stat.Size()
+		header.Mode = int64(stat.Mode())
+		header.ModTime = stat.ModTime()
+		// write the header to the tarball archive
+		if err := tw.WriteHeader(header); err != nil {
+			return err
+		}
+		// copy the file data to the tarball 
+		if _, err := io.Copy(tw, file); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-
-func tarit(source, target string) error {
-	filename := filepath.Base(source)
-	target = filepath.Join(target, fmt.Sprintf("%s.tar", filename))
-	tarfile, err := os.Create(target)
+func main() {
+	// set up the output file
+	var err error
+	var fds []os.FileInfo
+	file, err := os.Create("Dump.tar.gz")
 	if err != nil {
-		return err
+		panic(err)
 	}
-	defer tarfile.Close()
+	defer file.Close()
+	// set up the gzip writer	
+	gw := gzip.NewWriter(file)
+	defer gw.Close()
+	tw := tar.NewWriter(gw)
+	defer tw.Close()
 
-	tarball := tar.NewWriter(tarfile)
-	defer tarball.Close()
+	var targz_dir string = "/home/hal/dumps/archives/Dump20191115" 
+	var src_arr []string
 
-	info, err := os.Stat(source)
-	if err != nil {
-		return nil
+
+	if fds, err = ioutil.ReadDir(targz_dir); err != nil {
+		panic(err)
+	}
+	var max int = len(fds) - 1
+
+	for idx, fd := range fds {
+
+		var srcfp string = path.Join(targz_dir, fd.Name())
+
+		match, _ := regexp.MatchString(`\.sql$`, srcfp)
+
+		if match {
+			src_arr = append(src_arr, srcfp)
+			fmt.Printf("%v/%v. targz %v\n",idx, max, srcfp)
+
+			if err := addFile(tw, srcfp); err != nil {
+				panic(err)
+			}
+		}
+
 	}
 
-	var baseDir string
-	if info.IsDir() {
-		baseDir = filepath.Base(source)
-	}
-
-	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
-
-		if err != nil {
-			return err
-		}
-		header, err := tar.FileInfoHeader(info, info.Name())
-		if err != nil {
-			return err
-		}
-
-		if baseDir != "" {
-			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
-		}
-
-		if err := tarball.WriteHeader(header); err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		_, err = io.Copy(tarball, file)
-		return err
-	})
+	// add each file as needed into the current tar archive
+	//for i := range paths {
+		//fmt.Println(paths[i])
+		//if err := addFile(tw, paths[i]); err != nil {
+		//	log.Fatalln(err)
+		//}
+	//}
 }
