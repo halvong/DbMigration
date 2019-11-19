@@ -21,13 +21,13 @@ var version = "v2"
 var kind string = "qa"
 
 var copy_dir string
-var reads_dir string = "/home/hal/dumps/reads"
-var hot_dir string = "/home/hal/dumps/hot"
+var reads_dir string = "/home/hal/dumps/reads/"
+var hot_dir string = "/home/hal/dumps/hot/"
 var delete_dir string = "/home/hal/dumps/"
-var copy_targz_dir string = "/home/hal/dumps/archives"
+var copy_targz_dir string = "/home/hal/dumps/archives/"
 var targz_dir string = "/home/hal/dumps/" 
 var dest_targz_dir = "/home/hal/dumps/archives/"
-var destination_dir string = "/home/hal/Downloads/centos7work"
+var destination_dir string = "/home/hal/Downloads/centos7work/"
 var delete_infile_bool bool = false
 
 func main() {
@@ -51,12 +51,12 @@ func main() {
 	//3. Grep
 	//cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
 	
-	//4. Clean,  after upload is done
+	//4. Clean, deletes sql files only,  after upload is done
 	//var which = "clean" //deletes all files in hot
 
-	//5. Delete
+	//5. Delete Directory
 	//var which = "delete"
-	//delete_dir += "archives/Dump20191107"
+	//delete_dir += "Dump20191115"
 
 	//6. Copy Tar Gz
 	//var which = "copy_targz"
@@ -76,7 +76,7 @@ func main() {
 	} else if which == "copy_targz" {
 		ok = cc.CheckF([]string{"logs",copy_targz_dir,destination_dir})
 	} else if which == "targz" {
-		ok = cc.CheckF([]string{"logs",targz_dir,dest_targz_dir})
+		ok = cc.CheckF([]string{"logs",targz_dir})
 	} else {
 		ok = cc.CheckF([]string{"logs"})
 	}
@@ -175,6 +175,9 @@ func main() {
 		result = cc.CopyTargzfiles(&copy_targz_dir, &destination_dir)
 
 	} else if which == "targz" {
+		var fds []os.FileInfo
+
+		cc.DeleteFile(&dest_targz_dir) //deletes logfile
 
 		file, err := os.Create(dest_targz_dir)
 		if err != nil { panic(err) }
@@ -190,7 +193,6 @@ func main() {
 		}
 		var max int = len(fds) - 1
 
-		var fds []os.FileInfo
 		for idx, fd := range fds {
 
 			var srcfp string = path.Join(targz_dir, fd.Name())

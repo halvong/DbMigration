@@ -1,5 +1,5 @@
 DbMigration, Golang, working ubuntu
-11/15, Fri
+11/19, Tues
 
 includes gzip & tar
 
