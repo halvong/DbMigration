@@ -1,9 +1,5 @@
 package main
-/*
-reads - reads sql files
-writes - output after modification
-hot - files ready for import
-*/
+
 import (
 	"fmt"
 	"log"
@@ -35,9 +31,11 @@ func main() {
 	var files []string 
 	var ok bool = false 
 
-	fmt.Println("Starting script")
+	fmt.Println("Starting script", current.Format("2006-01-02") )
+	//var which string = ""
 	//0. Copy from Dump folder to read folder  
 	//var which = "copy" 
+	//copy_dir = "/home/hal/dumps/Dump"+current.Format("20060102")
 	//copy_dir = "/home/hal/dumps/Dump20191108"
 
 	//1. Migrate, process from read to hot folder
@@ -56,6 +54,7 @@ func main() {
 
 	//5. Delete Directory
 	//var which = "delete"
+	//delete_dir += "Dump"+current.Format("20060102")
 	//delete_dir += "Dump20191115"
 
 	//6. Copy Tar Gz
@@ -63,8 +62,10 @@ func main() {
 
 	//7. Tar Gz
 	//var which = "targz"
-	//targz_dir += "Dump20191115" 
-	//dest_targz_dir += "Dump20191115.tar.gz" 
+	//targz_dir += "Dump"+current.Format("20060102")
+	//dest_targz_dir += "Dump"+current.Format("20060102")+".tar.gz" 
+	//targz_dir += "Dump20191119" 
+	//dest_targz_dir += "Dump20191119.tar.gz" 
 
 	//checks for default folders/files
 	if which == "copy" {
