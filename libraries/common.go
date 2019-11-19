@@ -222,7 +222,10 @@ func RemoveDirectory(folder_ptr *string) bool {
 	return true
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dev
 
 func AddFile(tw * tar.Writer, path string) error {
 	file, err := os.Open(path)
@@ -249,4 +252,7 @@ func AddFile(tw * tar.Writer, path string) error {
 	return nil
 }
 
+<<<<<<< HEAD
 >>>>>>> refs/heads/dev
+=======
+>>>>>>> dev

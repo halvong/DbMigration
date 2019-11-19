@@ -1,15 +1,21 @@
 DbMigration, Golang, working ubuntu
+<<<<<<< HEAD
 11/08, Fri
 
 add moves tar.gz files to destination folder 
+=======
+11/19, Tues
+
+includes gzip & tar
+>>>>>>> dev
 
 #path
-cd /home/hal/Documents/softwares/go_eclipse/go_workspace/src/DbMigration
+cd /home/hal/Documents/softwares/go-eclipse/workspace/src/DbMigration
 
 #checks "no" live
 cd /home/hal/dumps/hot; grep -rni 'web_main_live' * 
 
-	
+
 #datatypes
 bool
 string
@@ -25,3 +31,6 @@ rune // alias for int32
 float32 float64
 
 complex64 complex128
+
+#notes
+fmt.Println("\ntype: ", reflect.TypeOf(fp))	
