@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 DbMigration, Golang, working ubuntu
 <<<<<<< HEAD
 11/08, Fri
@@ -7,6 +8,11 @@ add moves tar.gz files to destination folder
 11/19, Tues
 
 includes gzip & tar
+>>>>>>> dev
+=======
+DbMigration, Golang
+11/26, Tues
+
 >>>>>>> dev
 
 #path

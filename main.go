@@ -109,6 +109,7 @@ func main() {
 	//5. Delete Directory
 	//var which = "delete"
 	//delete_dir += "Dump"+current.Format("20060102")
+	//---
 	//delete_dir += "Dump20191115"
 <<<<<<< HEAD
 >>>>>>> refs/heads/dev
@@ -118,6 +119,7 @@ func main() {
 	var files []string 
 	current := time.Now()
 
+<<<<<<< HEAD
 	//checks for default folders/files
 	var ok bool = false 
 	if which == "copy" {
@@ -135,12 +137,16 @@ func main() {
 
 >>>>>>> dev
 	//6. Copy Tar Gz
+=======
+	//6. Copy Tar Gz to Downloads/centos7work
+>>>>>>> dev
 	//var which = "copy_targz"
 
 	//7. Tar Gz
 	//var which = "targz"
 	//targz_dir += "Dump"+current.Format("20060102")
 	//dest_targz_dir += "Dump"+current.Format("20060102")+".tar.gz" 
+	//---
 	//targz_dir += "Dump20191119" 
 	//dest_targz_dir += "Dump20191119.tar.gz" 
 
