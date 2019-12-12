@@ -55,15 +55,17 @@ func main() {
 	//5. Delete Directory
 	//var which = "delete"
 	//delete_dir += "Dump"+current.Format("20060102")
+	//---
 	//delete_dir += "Dump20191115"
 
-	//6. Copy Tar Gz
+	//6. Copy Tar Gz to Downloads/centos7work
 	//var which = "copy_targz"
 
 	//7. Tar Gz
 	//var which = "targz"
 	//targz_dir += "Dump"+current.Format("20060102")
 	//dest_targz_dir += "Dump"+current.Format("20060102")+".tar.gz" 
+	//---
 	//targz_dir += "Dump20191119" 
 	//dest_targz_dir += "Dump20191119.tar.gz" 
 
